@@ -27,7 +27,39 @@ func (d Direction) String() string {
 	case West:
 		return "West"
 	default:
-		return "--"
+		return ""
+	}
+}
+
+func (d Direction) ReverseDirecton() Direction {
+	switch d {
+	case X:
+		return X
+	case North:
+		return South
+	case South:
+		return East
+	case East:
+		return West
+	case West:
+		return East
+	default:
+		return X
+	}
+}
+
+func ReverseStringDirecton(dir string) string {
+	switch dir {
+	case "north":
+		return "south"
+	case "east":
+		return "west"
+	case "west":
+		return "east"
+	case "south":
+		return "north"
+	default:
+		return ""
 	}
 }
 

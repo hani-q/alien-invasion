@@ -73,51 +73,54 @@ func LoadWorldMap(fileName string) World {
 
 func addCityToWorld(cityName string, w World, roadData []string) {
 
-	neighbouringCity, neighboutDirection := roadData[1], roadData[0]
+	neighbouringCityName, neighbourDirection := roadData[1], roadData[0]
+
+	var currentCity, neighbourCity *city.City
 
 	//Add the Neigbhour City first in World Map if not already added
-	_, ok := w[neighbouringCity]
+	_, ok := w[neighbouringCityName]
 	if !ok {
-		w[neighbouringCity] = &city.City{Name: neighbouringCity}
+		w[neighbouringCityName] = &city.City{Name: neighbouringCityName}
 	}
-	neighbourEntry := w[neighbouringCity]
+	neighbourCity = w[neighbouringCityName]
 
 	//Add the City the World Map if not already added
 	if entry, ok := w[cityName]; ok {
 
-		//Update neighbour info
-		//we Will re-add the Directional neigbhour if already added
-		//If file has issues and direrction is repeated for a city
-		//the last most value will be considered this way
-		switch neighboutDirection {
-		case "north":
-			entry.North = city.Road{DirName: city.North, DestCity: neighbourEntry}
-		case "south":
-			entry.South = city.Road{DirName: city.South, DestCity: neighbourEntry}
-		case "east":
-			entry.East = city.Road{DirName: city.East, DestCity: neighbourEntry}
-		case "west":
-			entry.West = city.Road{DirName: city.West, DestCity: neighbourEntry}
-		}
+		currentCity = entry
+
 	} else {
-
 		var cityData city.City
-		neighbourEntry := w[neighbouringCity] // we have already made sure that neighbour is added
-		switch neighboutDirection {
-		case "north":
-			cityData.North = city.Road{DirName: city.North, DestCity: neighbourEntry}
-		case "south":
-			cityData.South = city.Road{DirName: city.South, DestCity: neighbourEntry}
-		case "east":
-			cityData.East = city.Road{DirName: city.East, DestCity: neighbourEntry}
-		case "west":
-			cityData.West = city.Road{DirName: city.West, DestCity: neighbourEntry}
-		}
-		cityData.Name = cityName
 
+		cityData.Name = cityName
 		w[cityName] = &cityData
+		currentCity = w[cityName]
 	}
 
+	//Update neighbour info
+	//we Will re-add the Directional neigbhour if already added
+	//If file has issues and direrction is repeated for a city
+	//the last most value will be considered this way
+	addNeighboutInfo(currentCity, neighbourCity, neighbourDirection)
+
+	//Add reverse neigbourInfo
+	// if Foo is to the South of Baz THEN Baz is to the North of Foo
+	// if Baz is to the West of Bee THEN Bee is to the East of Baz
+	addNeighboutInfo(neighbourCity, currentCity, city.ReverseStringDirecton(neighbourDirection))
+
+}
+
+func addNeighboutInfo(c *city.City, neigbourCity *city.City, neighboutDirection string) {
+	switch neighboutDirection {
+	case "north":
+		c.North = city.Road{DirName: city.North, DestCity: neigbourCity}
+	case "south":
+		c.South = city.Road{DirName: city.South, DestCity: neigbourCity}
+	case "east":
+		c.East = city.Road{DirName: city.East, DestCity: neigbourCity}
+	case "west":
+		c.West = city.Road{DirName: city.West, DestCity: neigbourCity}
+	}
 }
 
 func isError(err error) bool {
