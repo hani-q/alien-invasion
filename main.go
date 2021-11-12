@@ -1,7 +1,7 @@
 package main
 
 import (
-	"alien-invasion/world"
+	"alien-invasion/structs"
 	"flag"
 	"fmt"
 	"os"
@@ -27,12 +27,12 @@ func main() {
 		os.Exit(1)
 	}
 
-	xWorld := world.LoadWorldMap(*filePathPtr, alien_count)
+	xWorld := structs.LoadWorldMap(*filePathPtr, alien_count)
 	xWorld.BringInTheAliens(alien_count)
 	start_simulation(xWorld, fps)
 }
 
-func start_simulation(xWorld world.World, fps int64) {
+func start_simulation(xWorld structs.World, fps int64) {
 	for i := 0; i <= MAX_MOVES; i++ {
 		time.Sleep(time.Duration(fps) * time.Second)
 

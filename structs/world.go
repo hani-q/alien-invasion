@@ -1,8 +1,6 @@
-package world
+package structs
 
 import (
-	"alien-invasion/alien"
-	"alien-invasion/city"
 	"alien-invasion/util"
 	"bufio"
 	"fmt"
@@ -10,7 +8,7 @@ import (
 	"strings"
 )
 
-type World map[string]*city.City
+type World map[string]*City
 
 func (w World) String() string {
 
@@ -77,12 +75,11 @@ func (world World) BringInTheAliens(alien_count int) {
 	}
 
 	//Open the dimensional portal and let Zentardi descend from the Sky
-	aliens := alien.SpawnAliens(alien_count)
+	aliens := SpawnAliens(alien_count)
 
 	//Rehabilitate displaced Zentardi in EMPTY cities
 	for _, alien := range aliens {
 		for cityName := range world {
-			fmt.Println("selected", cityName, world[cityName].Invaders[0])
 			if world[cityName].Invaders[0] == nil {
 				alien.CurrentCityName = cityName
 				world[cityName].Invaders[0] = alien
@@ -96,12 +93,12 @@ func addCityToWorld(cityName string, w World, roadData []string) {
 
 	neighbouringCityName, neighbourDirection := roadData[1], roadData[0]
 
-	var currentCity, neighbourCity *city.City
+	var currentCity, neighbourCity *City
 
 	//Add the Neigbhour City first in World Map if not already added
 	_, ok := w[neighbouringCityName]
 	if !ok {
-		w[neighbouringCityName] = &city.City{Name: neighbouringCityName}
+		w[neighbouringCityName] = &City{Name: neighbouringCityName}
 	}
 	neighbourCity = w[neighbouringCityName]
 
@@ -111,7 +108,7 @@ func addCityToWorld(cityName string, w World, roadData []string) {
 		currentCity = entry
 
 	} else {
-		var cityData city.City
+		var cityData City
 
 		cityData.Name = cityName
 		w[cityName] = &cityData
@@ -127,20 +124,20 @@ func addCityToWorld(cityName string, w World, roadData []string) {
 	//Add reverse neigbourInfo
 	// if Foo is to the South of Baz THEN Baz is to the North of Foo
 	// if Baz is to the West of Bee THEN Bee is to the East of Baz
-	addNeighboutInfo(neighbourCity, currentCity, city.ReverseStringDirecton(neighbourDirection))
+	addNeighboutInfo(neighbourCity, currentCity, ReverseStringDirecton(neighbourDirection))
 
 }
 
-func addNeighboutInfo(c *city.City, neigbourCity *city.City, neighboutDirection string) {
+func addNeighboutInfo(c *City, neigbourCity *City, neighboutDirection string) {
 	switch neighboutDirection {
 	case "north":
-		c.North = &city.Road{DirName: city.North, DestCity: neigbourCity}
+		c.North = &Road{DirName: North, DestCity: neigbourCity}
 	case "south":
-		c.South = &city.Road{DirName: city.South, DestCity: neigbourCity}
+		c.South = &Road{DirName: South, DestCity: neigbourCity}
 	case "east":
-		c.East = &city.Road{DirName: city.East, DestCity: neigbourCity}
+		c.East = &Road{DirName: East, DestCity: neigbourCity}
 	case "west":
-		c.West = &city.Road{DirName: city.West, DestCity: neigbourCity}
+		c.West = &Road{DirName: West, DestCity: neigbourCity}
 	}
 }
 
@@ -152,19 +149,19 @@ func (w World) DeleteCity(cityName string) {
 		//and Delete the reverse road links
 
 		if entry.North != nil {
-			entry.North.DestCity.South = nil
+			entry.North.DestCity = nil
 		}
 
 		if entry.South != nil {
-			entry.South.DestCity.North = nil
+			entry.South.DestCity = nil
 		}
 
 		if entry.East != nil {
-			entry.East.DestCity.West = nil
+			entry.East.DestCity = nil
 		}
 
 		if entry.West != nil {
-			entry.West.DestCity.East = nil
+			entry.West.DestCity = nil
 		}
 	}
 

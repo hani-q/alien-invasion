@@ -1,4 +1,4 @@
-package alien
+package structs
 
 import (
 	"alien-invasion/util"

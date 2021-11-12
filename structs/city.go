@@ -1,7 +1,6 @@
-package city
+package structs
 
 import (
-	"alien-invasion/alien"
 	"fmt"
 )
 
@@ -67,7 +66,7 @@ func ReverseStringDirecton(dir string) string {
 type City struct {
 	Name                     string
 	North, South, East, West *Road
-	Invaders                 [2]*alien.Alien
+	Invaders                 [2]*Alien
 }
 
 func (c City) String() string {
