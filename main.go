@@ -17,7 +17,7 @@ func main() {
 	xWorld := world.LoadWorldMap(*filePathPtr)
 	// fmt.Println(xWorld)
 
-	// xWorld.DeleteCity("Foo")
+	xWorld.DeleteCity("Foo")
 
 	fmt.Println(xWorld)
 }

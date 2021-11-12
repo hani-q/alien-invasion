@@ -19,13 +19,13 @@ func (d Direction) String() string {
 	case X:
 		return ""
 	case North:
-		return "North"
+		return "north"
 	case South:
-		return "South"
+		return "south"
 	case East:
-		return "East"
+		return "east"
 	case West:
-		return "West"
+		return "west"
 	default:
 		return ""
 	}
@@ -86,9 +86,9 @@ func (r *Road) getRoadName() string {
 		return ""
 	}
 
-	return fmt.Sprintf(" %v=> %v", r.DirName, r.DestCity.getCityName())
+	return fmt.Sprintf("%v=%v", r.DirName, r.DestCity.getCityName())
 }
 
 func (c City) String() string {
-	return fmt.Sprintf("======%v======\n%v%v%v%v", c.Name, c.North.getRoadName(), c.East.getRoadName(), c.West.getRoadName(), c.South.getRoadName())
+	return fmt.Sprintf("%v %v %v %v %v", c.Name, c.North.getRoadName(), c.East.getRoadName(), c.West.getRoadName(), c.South.getRoadName())
 }

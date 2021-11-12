@@ -129,14 +129,26 @@ func (w World) DeleteCity(cityName string) {
 
 		//Check all of the Cities Roads and go to those Cities
 		//and Delete the reverse road links
-		northCity := entry.North.DestCity
-		if northCity != nil {
-			northCity.South = nil
+
+		if entry.North != nil {
+			entry.North.DestCity.South = nil
 		}
-		// northCity.South = nil
+
+		if entry.South != nil {
+			entry.South.DestCity.North = nil
+		}
+
+		if entry.East != nil {
+			entry.East.DestCity.West = nil
+		}
+
+		if entry.West != nil {
+			entry.West.DestCity.East = nil
+		}
 	}
 
-	delete(w, cityName)
+	//Delete the City itSelf
+	defer delete(w, cityName)
 
 }
 
