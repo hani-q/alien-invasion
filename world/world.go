@@ -113,14 +113,31 @@ func addCityToWorld(cityName string, w World, roadData []string) {
 func addNeighboutInfo(c *city.City, neigbourCity *city.City, neighboutDirection string) {
 	switch neighboutDirection {
 	case "north":
-		c.North = city.Road{DirName: city.North, DestCity: neigbourCity}
+		c.North = &city.Road{DirName: city.North, DestCity: neigbourCity}
 	case "south":
-		c.South = city.Road{DirName: city.South, DestCity: neigbourCity}
+		c.South = &city.Road{DirName: city.South, DestCity: neigbourCity}
 	case "east":
-		c.East = city.Road{DirName: city.East, DestCity: neigbourCity}
+		c.East = &city.Road{DirName: city.East, DestCity: neigbourCity}
 	case "west":
-		c.West = city.Road{DirName: city.West, DestCity: neigbourCity}
+		c.West = &city.Road{DirName: city.West, DestCity: neigbourCity}
 	}
+}
+
+func (w World) DeleteCity(cityName string) {
+
+	if entry, ok := w[cityName]; ok {
+
+		//Check all of the Cities Roads and go to those Cities
+		//and Delete the reverse road links
+		northCity := entry.North.DestCity
+		if northCity != nil {
+			northCity.South = nil
+		}
+		// northCity.South = nil
+	}
+
+	delete(w, cityName)
+
 }
 
 func isError(err error) bool {

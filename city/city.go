@@ -65,7 +65,7 @@ func ReverseStringDirecton(dir string) string {
 
 type City struct {
 	Name                     string
-	North, South, East, West Road
+	North, South, East, West *Road
 }
 
 type Road struct {
@@ -81,15 +81,14 @@ func (c *City) getCityName() string {
 	return c.Name
 }
 
-func (r Road) String() string {
-	if r.DirName == X {
+func (r *Road) getRoadName() string {
+	if r == nil {
 		return ""
 	}
 
-	return fmt.Sprintf("%v =>%v", r.DirName, r.DestCity.getCityName())
+	return fmt.Sprintf(" %v=> %v", r.DirName, r.DestCity.getCityName())
 }
 
 func (c City) String() string {
-
-	return fmt.Sprintf("======%v======\n%v\n%v%v\n%v\n=====================", c.Name, c.North, c.East, c.West, c.South)
+	return fmt.Sprintf("======%v======\n%v%v%v%v", c.Name, c.North.getRoadName(), c.East.getRoadName(), c.West.getRoadName(), c.South.getRoadName())
 }

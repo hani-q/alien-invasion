@@ -15,5 +15,9 @@ func main() {
 	flag.Parse()
 
 	xWorld := world.LoadWorldMap(*filePathPtr)
+	// fmt.Println(xWorld)
+
+	// xWorld.DeleteCity("Foo")
+
 	fmt.Println(xWorld)
 }
