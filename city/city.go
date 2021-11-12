@@ -7,7 +7,8 @@ import (
 type Direction int
 
 const (
-	North Direction = iota
+	X Direction = iota
+	North
 	South
 	East
 	West
@@ -15,6 +16,8 @@ const (
 
 func (d Direction) String() string {
 	switch d {
+	case X:
+		return ""
 	case North:
 		return "North"
 	case South:
@@ -23,7 +26,6 @@ func (d Direction) String() string {
 		return "East"
 	case West:
 		return "West"
-
 	default:
 		return "--"
 	}
@@ -39,10 +41,23 @@ type Road struct {
 	DestCity *City
 }
 
+func (c *City) getCityName() string {
+	if c == nil {
+		return "XXXX"
+	}
+
+	return c.Name
+}
+
 func (r Road) String() string {
-	return fmt.Sprintf("%v =>%v", r.DirName, r.DestCity.Name)
+	if r.DirName == X {
+		return ""
+	}
+
+	return fmt.Sprintf("%v =>%v", r.DirName, r.DestCity.getCityName())
 }
 
 func (c City) String() string {
-	return fmt.Sprintf("======%v======\n\t%v\n%v\t%v\n\t%v\n=============", c.Name, c.North, c.East, c.West, c.South)
+
+	return fmt.Sprintf("======%v======\n%v\n%v%v\n%v\n=====================", c.Name, c.North, c.East, c.West, c.South)
 }

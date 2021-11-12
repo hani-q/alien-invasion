@@ -1,23 +1,19 @@
 package main
 
 import (
-	"alien-invasion/city"
+	"alien-invasion/world"
+	"flag"
 	"fmt"
 )
 
 func main() {
 
-	c1 := city.City{Name: "Islamabad"}
-	c2 := city.City{Name: "Lahore"}
-	c3 := city.City{Name: "Faisalabad"}
-	c4 := city.City{Name: "Karachi"}
-	c5 := city.City{Name: "Quetta"}
+	//Parse all input args
+	var alien_count int
+	flag.IntVar(&alien_count, "aliens", 4, "Count of the Aliens that will descen upon the world")
+	filePathPtr := flag.String("world_file", "./test/world.txt", "Text file containing the world")
+	flag.Parse()
 
-	c1.North = city.Road{DirName: city.North, DestCity: &c2}
-	c1.South = city.Road{DirName: city.South, DestCity: &c3}
-	c1.East = city.Road{DirName: city.East, DestCity: &c4}
-	c1.West = city.Road{DirName: city.West, DestCity: &c5}
-
-	fmt.Println(c1)
-
+	xWorld := world.LoadWorldMap(*filePathPtr)
+	fmt.Println(xWorld)
 }
