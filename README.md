@@ -56,6 +56,7 @@ the assumptions you are making."*
    
 
 ****Assumptions****
+
 1. Each city name is unique. if a city is repeated in the world file, the last entry will take presedence.
 2. City name can be any string literal. "1" is also a valid city name. Who are we to judge X-worldlings.
 3. Each city can only have one neghbouring city in one direction. 
