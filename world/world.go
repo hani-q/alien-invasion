@@ -1,6 +1,7 @@
 package world
 
 import (
+	"alien-invasion/alien"
 	"alien-invasion/city"
 	"alien-invasion/util"
 	"bufio"
@@ -11,17 +12,14 @@ import (
 
 type World map[string]*city.City
 
-var XWorld World
-
 func (w World) String() string {
 
 	var printData string
 
 	if w == nil || len(w) == 0 {
-		return "World is Empty!..Generate World Map first"
+		return "World is Empty!...Generate World Map first"
 	} else {
 		for _, cityData := range w {
-
 			printData = printData + fmt.Sprintln(cityData)
 		}
 
@@ -29,7 +27,7 @@ func (w World) String() string {
 	}
 }
 
-func LoadWorldMap(fileName string) World {
+func LoadWorldMap(fileName string, alien_count int) World {
 	file, err := os.Open(fileName)
 	if isError(err) {
 		os.Exit(1)
@@ -69,6 +67,29 @@ func LoadWorldMap(fileName string) World {
 
 	return world
 
+}
+
+func (world World) BringInTheAliens(alien_count int) {
+
+	if len(world) < alien_count {
+		fmt.Println("Aliens cannot live in such a congested (simulated) world..\n Add more cities to World file")
+		os.Exit(1)
+	}
+
+	//Open the dimensional portal and let Zentardi descend from the Sky
+	aliens := alien.SpawnAliens(alien_count)
+
+	//Rehabilitate displaced Zentardi in EMPTY cities
+	for _, alien := range aliens {
+		for cityName := range world {
+			fmt.Println("selected", cityName, world[cityName].Invaders[0])
+			if world[cityName].Invaders[0] == nil {
+				alien.CurrentCityName = cityName
+				world[cityName].Invaders[0] = alien
+				break
+			}
+		}
+	}
 }
 
 func addCityToWorld(cityName string, w World, roadData []string) {

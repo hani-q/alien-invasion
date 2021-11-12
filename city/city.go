@@ -1,6 +1,7 @@
 package city
 
 import (
+	"alien-invasion/alien"
 	"fmt"
 )
 
@@ -66,6 +67,11 @@ func ReverseStringDirecton(dir string) string {
 type City struct {
 	Name                     string
 	North, South, East, West *Road
+	Invaders                 [2]*alien.Alien
+}
+
+func (c City) String() string {
+	return fmt.Sprintf("%v %v %v %v %v [%v, %v]", c.Name, c.North.getRoadName(), c.East.getRoadName(), c.West.getRoadName(), c.South.getRoadName(), c.Invaders[0], c.Invaders[1])
 }
 
 type Road struct {
@@ -87,8 +93,4 @@ func (r *Road) getRoadName() string {
 	}
 
 	return fmt.Sprintf("%v=%v", r.DirName, r.DestCity.getCityName())
-}
-
-func (c City) String() string {
-	return fmt.Sprintf("%v %v %v %v %v", c.Name, c.North.getRoadName(), c.East.getRoadName(), c.West.getRoadName(), c.South.getRoadName())
 }

@@ -62,7 +62,10 @@ the assumptions you are making."*
 4. Any direction that is not 4 standard Cardinal directions will be ignored.
 5. If "Foo" is to the North of "Baz". Then "Baz" is to the South of "Foo". So adding a link one way.. it will be added both ways between both cities.
 6. If "Foo" is destroyed its North-ward road to "Baz" is destroyed. "Baz"'s Southward road to "Foo" is also destroyed.
-7. Each city can only handle 2 aliens. these guys are Humongous.
-8. Any Alien when he leaves the city, doesnt like to go back.
+7. Aliens when the arrive on X-World. avoid going to any city that already has an alien. Meaning on the start of program each city can at max have 1 alien and at min have 0.
+8. Each city can only handle 2 aliens. these guys are Humongous.
+9. Any Alien when he leaves the city, doesnt like to go back to the same city (if offcourse that City has not been destoryed)
+10. Aliens cannot be greater then the Count of Cities. So in best case sceanrio num Aliens === num Cities.
+11. Atleast 2 Aliens should descend upon X-World
 
 
