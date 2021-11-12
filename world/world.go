@@ -59,7 +59,7 @@ func LoadWorldMap(fileName string) World {
 				//direction should always be lower case
 				roadData[0] = strings.ToLower(roadData[0])
 
-				// Making sure City name in file is always begings with a Cap
+				// Making sure City name in file is always begins with a Cap
 				roadData[1] = util.Capitalise(roadData[1])
 
 				addCityToWorld(cityName, world, roadData)
