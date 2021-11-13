@@ -51,7 +51,7 @@ the assumptions you are making."*
 4. The populace in X-world (X-wolrdlings still dont prefer to call it X-Grid) all use flying as means of transportation. Only Cyclists are allowed to use roads.
 5. All cities have only 4 roads (in cardinal directions) leading in and out of each city.
 6. Alien species is called "Zentradi". They came to X-world by means of flying. After interacting with Earths atmosphere they can only crawl on Asphalt
-7. Zentardi have become Feral after intereacing with the X-world's atmosphere and wanty to kill each other off. When one Zentradi dies he unleases a nucealear blast that can wipe out an entire city and any other Zentradi
+7. Zentardi have become Feral after interacting with the X-world's atmosphere and wanty to kill each other off. When one Zentradi dies he unleases a nucealear blast that can wipe out an entire city and any other Zentradi
 8. X-worldlings dont offer any resitance to the Zentradi invasion
    
 
@@ -65,7 +65,7 @@ the assumptions you are making."*
 6. If "Foo" is destroyed its North-ward road to "Baz" is destroyed. "Baz"'s Southward road to "Foo" is also destroyed.
 7. Aliens when the arrive on X-World. avoid going to any city that already has an alien. Meaning on the start of program each city can at max have 1 alien and at min have 0.
 8. Each city can only handle 2 aliens. these guys are Humongous.
-9. Any Alien when he leaves the city, doesnt like to go back to the same city (if offcourse that City has not been destoryed)
+9. Alien can go back to the city it just came from.
 10. Aliens cannot be greater then the Count of Cities. So in best case sceanrio num Aliens === num Cities.
 11. Atleast 2 Aliens should descend upon X-World
 

@@ -5,6 +5,7 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"sync"
 )
 
 func main() {
@@ -26,9 +27,17 @@ func main() {
 }
 
 func start_simulation(xWorld structs.World) {
+	var wg sync.WaitGroup
+	count := 0
 	for _, alienData := range structs.Ayp {
-		alienData.Wander()
-		break
+
+		fmt.Println("Launching Alien", alienData.Name)
+		wg.Add(1)
+		go alienData.Wander(&wg)
+		count++
+
 	}
+
+	wg.Wait()
 
 }

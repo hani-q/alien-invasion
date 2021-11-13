@@ -47,7 +47,7 @@ func ReverseStringDirecton(dir string) string {
 	}
 }
 
-func (c *City) RandomNeighbour(prevCityName string) (*City, string) {
+func (c *City) RandomNeighbour() (*City, string) {
 
 	availableNeighbours := make(map[string]*City)
 
@@ -55,14 +55,14 @@ func (c *City) RandomNeighbour(prevCityName string) (*City, string) {
 	//or the Previously Visited City Name
 	if c.North != nil {
 		if c.North.DestCity != nil {
-			if c.Name != c.North.DestCity.Name && prevCityName != c.North.DestCity.Name {
+			if c.Name != c.North.DestCity.Name {
 				availableNeighbours["North"] = c.North.DestCity
 			}
 		}
 	}
 	if c.South != nil {
 		if c.South.DestCity != nil {
-			if c.Name != c.South.DestCity.Name && prevCityName != c.South.DestCity.Name {
+			if c.Name != c.South.DestCity.Name {
 				availableNeighbours["South"] = c.South.DestCity
 			}
 		}
@@ -71,7 +71,7 @@ func (c *City) RandomNeighbour(prevCityName string) (*City, string) {
 
 	if c.East != nil {
 		if c.East.DestCity != nil {
-			if c.Name != c.East.DestCity.Name && prevCityName != c.East.DestCity.Name {
+			if c.Name != c.East.DestCity.Name {
 				availableNeighbours["East"] = c.East.DestCity
 			}
 		}
@@ -79,7 +79,7 @@ func (c *City) RandomNeighbour(prevCityName string) (*City, string) {
 
 	if c.West != nil {
 		if c.West.DestCity != nil {
-			if c.Name != c.West.DestCity.Name && prevCityName != c.West.DestCity.Name {
+			if c.Name != c.West.DestCity.Name {
 				availableNeighbours["West"] = c.West.DestCity
 			}
 		}
