@@ -11,13 +11,8 @@ import (
 )
 
 const (
-	MAX_MOVES = 20
+	MAX_MOVES = 10
 )
-
-type AlienCommChan struct {
-	cmd       string
-	alienName string
-}
 
 type Alien struct {
 	Name        string
@@ -25,7 +20,7 @@ type Alien struct {
 	CurrentCity *City
 	trapped     bool
 	dead        bool
-	exhausted   bool
+	mu          sync.Mutex
 }
 
 func (a *Alien) String() string {
@@ -36,47 +31,56 @@ func (a *Alien) Wander(wg *sync.WaitGroup) {
 	fmt.Printf("Alien[%v] has started to Wander\n", a.Name)
 	fmt.Printf("Alien[%v] => is in '%v' === ITER:[%v]\n", a.Name, a.CurrentCity.Name, 0)
 
-	select {
-	default:
-		for i := 1; i <= MAX_MOVES; i++ {
-			if a.dead {
-				fmt.Printf("Alien[%v] => is **DEAD** in '%v' === ITER:[%v]\n", a.Name, a.CurrentCity.Name, i)
-				break
-			}
+	for i := 1; i <= MAX_MOVES; i++ {
 
-			time.Sleep(time.Duration(rand.Intn(1000)) * time.Millisecond)
-			a.CurrentCity.mu.Lock()
+		a.CurrentCity.mu.Lock()
+		time.Sleep(time.Duration(rand.Intn(1000)) * time.Millisecond)
 
-			//Move to next posible City
-			nextCity, direction := a.CurrentCity.RandomNeighbour()
-			if nextCity != nil {
+		//Move to next posible City
+		nextCity, direction := a.CurrentCity.RandomNeighbour()
 
-				if nextCity.Invader != nil && nextCity.Invader.Name != a.Name {
-					//Get ready to fight the other baddie
-					fmt.Printf("Alien[%v] => MOVED %v '%v' from '%v' === ITER:[%v]\n", a.Name, direction, nextCity.Name, a.CurrentCity.Name, i)
-					fmt.Printf("*** Alien[%v] VS Alien[%v] in '%v' ***\n", a.Name, nextCity.Invader.Name, nextCity.Name)
-					fmt.Printf("Alien[%v] => is **DEAD** in '%v' === ITER:[%v]\n", a.Name, nextCity.Name, i)
-					//Kill both aliens..
-					a.dead = true
-					nextCity.Invader.dead = true
-					a.CurrentCity.mu.Unlock()
-					break
-				}
+		if nextCity != nil {
 
-				a.CurrentCity.mu.Unlock()
+			if nextCity.Invader != nil && nextCity.Invader.Name != a.Name {
+				nextCity.mu.Lock()
+				nextCity.Invader.mu.Lock()
+				//Get ready to fight the other baddie
 				fmt.Printf("Alien[%v] => MOVED %v '%v' from '%v' === ITER:[%v]\n", a.Name, direction, nextCity.Name, a.CurrentCity.Name, i)
-				a.CurrentCity = nextCity
+				fmt.Printf("*** Alien[%v] VS Alien[%v] in '%v' ***\n", a.Name, nextCity.Invader.Name, nextCity.Name)
 
-				if i == MAX_MOVES {
-					fmt.Printf("Alien[%v] => is **TIRED** in '%v' === ITER:[%v]\n", a.Name, a.CurrentCity.Name, i)
-					a.exhausted = true
-				}
-			} else {
-				a.trapped = true
-				fmt.Printf("Alien[%v] => is **TRAPPED** in '%v' === ITER:[%v]\n", a.Name, a.CurrentCity.Name, i)
+				//Kill both aliens..
+				a.dead = true
+				fmt.Printf("Alien[%v] => is **DEAD** in '%v' === ITER:[%v]\n", a.Name, nextCity.Name, i)
+				nextCity.Invader.dead = true
+
+				// nextCity.Invader.dieCmdCh <- true
 				a.CurrentCity.mu.Unlock()
+
+				//DELETE CITY FROM WORLD
+				nextCity.mu.Unlock()
+				nextCity.Invader.mu.Unlock()
+
 				break
 			}
+
+			a.CurrentCity.mu.Unlock()
+			fmt.Printf("Alien[%v] => MOVED %v '%v' from '%v' === ITER:[%v]\n", a.Name, direction, nextCity.Name, a.CurrentCity.Name, i)
+			a.CurrentCity = nextCity
+
+		} else {
+			a.trapped = true
+			fmt.Printf("Alien[%v] => is **TRAPPED** in '%v' === ITER:[%v]\n", a.Name, a.CurrentCity.Name, i)
+			a.CurrentCity.mu.Unlock()
+			break
+		}
+
+		if a.dead {
+			fmt.Printf("Alien[%v] => is **DEAD** in '%v' === ITER:[%v]\n", a.Name, a.CurrentCity.Name, i)
+			break
+		}
+		if a.trapped {
+			fmt.Printf("Alien[%v] => is **TRAPPED** in '%v' === ITER:[%v]\n", a.Name, a.CurrentCity.Name, i)
+			break
 		}
 	}
 

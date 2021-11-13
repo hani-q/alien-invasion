@@ -68,5 +68,6 @@ the assumptions you are making."*
 9. Alien can go back to the city it just came from.
 10. Aliens cannot be greater then the Count of Cities. So in best case sceanrio num Aliens === num Cities.
 11. Atleast 2 Aliens should descend upon X-World
+12. World file will atleast one direction against a mentioned city
 
 

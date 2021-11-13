@@ -117,7 +117,8 @@ func addCityToWorld(cityName string, w World, roadData []string) {
 	}
 	neighbourCity = w[neighbouringCityName]
 
-	//Add the City the World Map if not already added
+	//Add the City to the World Map if not already added
+	//Repeated cities will be ignored
 	if entry, ok := w[cityName]; ok {
 
 		currentCity = entry
@@ -134,15 +135,16 @@ func addCityToWorld(cityName string, w World, roadData []string) {
 	//we Will re-add the Directional neigbhour if already added
 	//If file has issues and direrction is repeated for a city
 	//the last most value will be considered this way
-	addNeighboutInfo(currentCity, neighbourCity, neighbourDirection)
+	addNeighbourInfo(currentCity, neighbourCity, neighbourDirection)
 
 	//Add reverse neigbourInfo
 	// if Foo is to the South of Baz THEN Baz is to the North of Foo
 	// if Baz is to the West of Bee THEN Bee is to the East of Baz
-	addNeighboutInfo(neighbourCity, currentCity, ReverseStringDirecton(neighbourDirection))
+
+	addNeighbourInfo(neighbourCity, currentCity, ReverseStringDirecton(neighbourDirection))
 }
 
-func addNeighboutInfo(c *City, neigbourCity *City, neighboutDirection string) {
+func addNeighbourInfo(c *City, neigbourCity *City, neighboutDirection string) {
 	switch neighboutDirection {
 	case "north":
 		c.North = &Road{DirName: North, DestCity: neigbourCity}
