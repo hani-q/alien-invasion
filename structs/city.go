@@ -47,11 +47,18 @@ func ReverseStringDirecton(dir string) string {
 	}
 }
 
+type City struct {
+	Name                     string
+	North, South, East, West *Road
+	Invader                  *Alien
+	mu                       sync.Mutex
+}
+
 func (c *City) RandomNeighbour() (*City, string) {
 
 	availableNeighbours := make(map[string]*City)
 
-	//Make a sice of Neighs that are not NIL and dont match Current City Name
+	//Make a slice of Neighs that are not NIL and dont match Current City Name
 	//or the Previously Visited City Name
 	if c.North != nil {
 		if c.North.DestCity != nil {
@@ -93,13 +100,6 @@ func (c *City) RandomNeighbour() (*City, string) {
 
 	return nil, ""
 
-}
-
-type City struct {
-	Name                     string
-	North, South, East, West *Road
-	Invader                  *Alien
-	mu                       sync.Mutex
 }
 
 func (c *City) String() string {

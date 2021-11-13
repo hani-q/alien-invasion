@@ -23,10 +23,27 @@ func main() {
 
 	xWorld := structs.LoadWorldMap(*filePathPtr, alien_count)
 	xWorld.BringInTheAliens(alien_count)
-	start_simulation(xWorld)
+	start_simulation()
+	fmt.Println(xWorld)
+
+	//print Alien Stats
+
+	var deadAliens []string
+	var trappedAliens []string
+	for alienName, alienData := range structs.Ayp {
+		if alienData.Dead {
+			deadAliens = append(deadAliens, alienName)
+		}
+		if alienData.Trapped {
+			trappedAliens = append(trappedAliens, alienName)
+		}
+	}
+
+	fmt.Println(deadAliens)
+	fmt.Println(trappedAliens)
 }
 
-func start_simulation(xWorld structs.World) {
+func start_simulation() {
 	var wg sync.WaitGroup
 
 	count := 0

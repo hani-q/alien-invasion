@@ -49,7 +49,7 @@ the assumptions you are making."*
 2. X-world is in an alternate dimension (and biologically similar to Earth.)
 3. X-world is ruled by an obnoxius Dictator. He for some reason destoryed and recreated all the cities on X World and renamed this world the "X-Grid"
 4. The populace in X-world (X-wolrdlings still dont prefer to call it X-Grid) all use flying as means of transportation. Only Cyclists are allowed to use roads.
-5. All cities have only 4 roads (in cardinal directions) leading in and out of each city.
+5. All cities have can have up to 4 roads (in cardinal directions) leading in and out of each city.
 6. Alien species is called "Zentradi". They came to X-world by means of flying. After interacting with Earths atmosphere they can only crawl on Asphalt
 7. Zentardi have become Feral after interacting with the X-world's atmosphere and wanty to kill each other off. When one Zentradi dies he unleases a nucealear blast that can wipe out an entire city and any other Zentradi
 8. X-worldlings dont offer any resitance to the Zentradi invasion
@@ -60,7 +60,7 @@ the assumptions you are making."*
 1. Each city name is unique. if a city is repeated in the world file, the last entry will take presedence.
 2. City name can be any string literal. "1" is also a valid city name. Who are we to judge X-worldlings.
 3. Each city can only have one neghbouring city in one direction. 
-4. Any direction that is not 4 standard Cardinal directions will be ignored.
+4. Any direction that is not the 4 standard Cardinal directions will be ignored.
 5. If "Foo" is to the North of "Baz". Then "Baz" is to the South of "Foo". So adding a link one way.. it will be added both ways between both cities.
 6. If "Foo" is destroyed its North-ward road to "Baz" is destroyed. "Baz"'s Southward road to "Foo" is also destroyed.
 7. Aliens when the arrive on X-World. avoid going to any city that already has an alien. Meaning on the start of program each city can at max have 1 alien and at min have 0.

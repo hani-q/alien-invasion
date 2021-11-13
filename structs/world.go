@@ -24,6 +24,8 @@ func (Ayp AlienYellowPages) String() string {
 
 type World map[string]*City
 
+var XWorld = make(World)
+
 func (w World) String() string {
 
 	var printData string
@@ -39,7 +41,7 @@ func (w World) String() string {
 	}
 }
 
-func LoadWorldMap(fileName string, alien_count int) World {
+func LoadWorldMap(fileName string, alien_count int) *World {
 	file, err := os.Open(fileName)
 	if isError(err) {
 		os.Exit(1)
@@ -53,8 +55,6 @@ func LoadWorldMap(fileName string, alien_count int) World {
 	for scanner.Scan() {
 		fileLines = append(fileLines, scanner.Text())
 	}
-
-	world := make(World)
 
 	for _, line := range fileLines {
 		cityData := strings.Split(line, " ")
@@ -72,12 +72,12 @@ func LoadWorldMap(fileName string, alien_count int) World {
 				// Making sure City name in file is always begins with a Cap
 				roadData[1] = util.Capitalise(roadData[1])
 
-				addCityToWorld(cityName, world, roadData)
+				addCityToWorld(cityName, XWorld, roadData)
 			}
 		}
 	}
 
-	return world
+	return &XWorld
 }
 
 func (world World) BringInTheAliens(alien_count int) {
@@ -165,18 +165,22 @@ func (w World) DeleteCity(cityName string) {
 		//and Delete the reverse road links
 
 		if entry.North != nil {
+			entry.North.DestCity.South = nil
 			entry.North.DestCity = nil
 		}
 
 		if entry.South != nil {
+			entry.South.DestCity.North = nil
 			entry.South.DestCity = nil
 		}
 
 		if entry.East != nil {
+			entry.East.DestCity.West = nil
 			entry.East.DestCity = nil
 		}
 
 		if entry.West != nil {
+			entry.West.DestCity.East = nil
 			entry.West.DestCity = nil
 		}
 	}
