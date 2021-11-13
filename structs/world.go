@@ -5,8 +5,22 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"reflect"
 	"strings"
 )
+
+type AlienYellowPages map[string]*Alien
+
+var Ayp AlienYellowPages = make(AlienYellowPages)
+
+func (Ayp AlienYellowPages) String() string {
+	keys := reflect.ValueOf(Ayp).MapKeys()
+	strkeys := make([]string, len(keys))
+	for i := 0; i < len(keys); i++ {
+		strkeys[i] = keys[i].String()
+	}
+	return strings.Join(strkeys, ",")
+}
 
 type World map[string]*City
 
@@ -81,12 +95,15 @@ func (world World) BringInTheAliens(alien_count int) {
 	for _, alien := range aliens {
 		for cityName := range world {
 			if world[cityName].Invaders[0] == nil {
-				alien.CurrentCityName = cityName
+				alien.CurrentCity = world[cityName]
 				world[cityName].Invaders[0] = alien
 				break
 			}
 		}
+
+		Ayp[alien.Name] = alien
 	}
+
 }
 
 func addCityToWorld(cityName string, w World, roadData []string) {

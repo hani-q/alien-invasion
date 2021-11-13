@@ -1,0 +1,15 @@
+Foo north=Bar west=Baz south=Qu-ux
+Bar south=Foo west=Bee
+Nueton north=Vrason west=Krock south=Qu-ux east=Peanburgh
+Vrason north=Flogas west=Akrard south=Diland east=Phita
+Tricwood north=Krock west=Bloibert
+Flogas south=Yhery east=Bifdiff
+Jauxlens
+Droln north=Enceling west=Diland south=Bifdiff east=Jaco
+Akrard north=Uzramouth west=Bifdiff south=Bloibert east=Inasron
+Krock north=Uzramouth west=Yhery
+Ulland north=Vrason west=Bloibert south=Nueton east=Diland
+Inasron north=Flogas west=Akrard
+Diland south=Bifdiff east=Jaco
+Bloibert north=Akrard south=Bar
+Uzramouth
