@@ -1,12 +1,14 @@
 package structs
 
 import (
-	"alien-invasion/util"
 	"bufio"
 	"fmt"
 	"os"
 	"reflect"
 	"strings"
+
+	"github.com/hani-q/alien-invasion/util"
+	log "github.com/sirupsen/logrus"
 )
 
 type AlienYellowPages map[string]*Alien
@@ -76,6 +78,9 @@ func LoadWorldMap(fileName string, alien_count int) *World {
 			}
 		}
 	}
+
+	//Print Statistics about the cities
+	log.Infof("%v cities have been loaded from map file", len(XWorld))
 
 	return &XWorld
 }

@@ -1,61 +1,83 @@
 package main
 
 import (
-	"alien-invasion/structs"
 	"flag"
 	"fmt"
 	"os"
+	"strings"
 	"sync"
+
+	"github.com/hani-q/alien-invasion/structs"
+	log "github.com/sirupsen/logrus"
 )
 
 func main() {
-
-	//Parse all input args
-	var alien_count int
-	flag.IntVar(&alien_count, "aliens", 4, "Count of the Aliens that will descen upon the world")
-	filePathPtr := flag.String("world_file", "./test/world.txt", "Text file containing the world")
+	//Parsing input arguments
+	var alienCount int
+	flag.IntVar(&alienCount, "aliens", 4, "Count of the Aliens that will descen upon the world")
+	filePathPtr := flag.String("world_file", "./test/world_tiny.txt", "Text file containing the world")
 	flag.Parse()
 
-	if alien_count < 2 {
-		fmt.Println("Too few Aliens for simulation, what will a lonely Alien do...")
+	//InitalizeLogging
+	// var file, err = os.OpenFile("build/logs.txt", os.O_WRONLY|os.O_CREATE, 0666)
+	// if err != nil {
+	// 	fmt.Println("Could Not Open Log File : " + err.Error())
+	// }
+	// log.SetOutput(file)
+	// log.SetFormatter(&log.JSONFormatter{})
+	log.SetFormatter(&log.TextFormatter{})
+
+	//One alien will roam the world endlessly, since no City will be destroyed
+	if alienCount < 2 {
+		_ = fmt.Errorf("too few aliens (%v) for simulation, what will a lonely alien do", alienCount)
 		os.Exit(1)
 	}
 
-	xWorld := structs.LoadWorldMap(*filePathPtr, alien_count)
-	xWorld.BringInTheAliens(alien_count)
-	start_simulation()
-	fmt.Println(xWorld)
+	//Load the map.txt file into the Map pf world
+	log.Info("Loading world from Map file", *filePathPtr)
+	xWorld := structs.LoadWorldMap(*filePathPtr, alienCount)
 
-	//print Alien Stats
+	//Spawn the Aliens and assign each to a unique and random city
+	xWorld.BringInTheAliens(alienCount)
 
+	//Log the state of the Wold before the mayhem
+	log.Info(xWorld)
+
+	//Start the simulation
+	startSimulation()
+
+	//Log the state of the Wold after the mayhem
+	log.Info(xWorld)
+
+	//Printing Alien stats after the simulation ends
 	var deadAliens []string
 	var trappedAliens []string
 	for alienName, alienData := range structs.Ayp {
 		if alienData.Dead {
 			deadAliens = append(deadAliens, alienName)
-		}
-		if alienData.Trapped {
+		} else if alienData.Trapped {
 			trappedAliens = append(trappedAliens, alienName)
 		}
 	}
 
-	fmt.Println(deadAliens)
-	fmt.Println(trappedAliens)
+	log.Infof("%v Aliens died in active combat\nName=%v", len(deadAliens), strings.Join(deadAliens, ", "))
+	log.Infof("%v Aliens are still trapped and need rescue\nNames=%v", len(trappedAliens), strings.Join(trappedAliens, ", "))
 }
 
-func start_simulation() {
+//Starts the simulation by creating a WaitGroup for all the
+//stored in Alien Yello Pages map
+func startSimulation() {
 	var wg sync.WaitGroup
 
-	count := 0
 	for _, alienData := range structs.Ayp {
-
-		fmt.Println("Launching Alien", alienData.Name)
+		log.Infof("Launching Alien=%v", alienData.Name)
 		wg.Add(1)
-		go alienData.Wander(&wg)
-		count++
 
+		//Calling wander will make the Alien explore its
+		//neighbouring cities
+		go alienData.Wander(&wg)
 	}
 
+	//Wait for all Aliens to finish (Dear or Alive or Trapped)
 	wg.Wait()
-
 }
