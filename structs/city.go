@@ -98,7 +98,7 @@ func (c *City) RandomNeighbour() (*City, string) {
 type City struct {
 	Name                     string
 	North, South, East, West *Road
-	Invaders                 [2]*Alien
+	Invader                  *Alien
 	mu                       sync.Mutex
 }
 

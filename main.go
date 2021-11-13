@@ -28,6 +28,7 @@ func main() {
 
 func start_simulation(xWorld structs.World) {
 	var wg sync.WaitGroup
+
 	count := 0
 	for _, alienData := range structs.Ayp {
 

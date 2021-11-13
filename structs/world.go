@@ -78,7 +78,6 @@ func LoadWorldMap(fileName string, alien_count int) World {
 	}
 
 	return world
-
 }
 
 func (world World) BringInTheAliens(alien_count int) {
@@ -94,16 +93,15 @@ func (world World) BringInTheAliens(alien_count int) {
 	//Rehabilitate displaced Zentardi in EMPTY cities
 	for _, alien := range aliens {
 		for cityName := range world {
-			if world[cityName].Invaders[0] == nil {
+			if world[cityName].Invader == nil {
 				alien.CurrentCity = world[cityName]
-				world[cityName].Invaders[0] = alien
+				world[cityName].Invader = alien
 				break
 			}
 		}
 
 		Ayp[alien.Name] = alien
 	}
-
 }
 
 func addCityToWorld(cityName string, w World, roadData []string) {
@@ -142,7 +140,6 @@ func addCityToWorld(cityName string, w World, roadData []string) {
 	// if Foo is to the South of Baz THEN Baz is to the North of Foo
 	// if Baz is to the West of Bee THEN Bee is to the East of Baz
 	addNeighboutInfo(neighbourCity, currentCity, ReverseStringDirecton(neighbourDirection))
-
 }
 
 func addNeighboutInfo(c *City, neigbourCity *City, neighboutDirection string) {
@@ -184,7 +181,6 @@ func (w World) DeleteCity(cityName string) {
 
 	//Delete the City itSelf
 	defer delete(w, cityName)
-
 }
 
 func isError(err error) bool {
