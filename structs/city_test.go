@@ -4,6 +4,7 @@ import (
 	"testing"
 )
 
+//Test if a direction is properly reversed
 func TestReverseDirectonNorth(t *testing.T) {
 
 	var d Direction = North
@@ -16,6 +17,7 @@ func TestReverseDirectonNorth(t *testing.T) {
 	}
 }
 
+//Test if a direction is properly reversed
 func TestReverseDirectonSouth(t *testing.T) {
 
 	var d Direction = South
@@ -28,6 +30,7 @@ func TestReverseDirectonSouth(t *testing.T) {
 	}
 }
 
+//Test if a direction is properly reversed
 func TestReverseDirectonEast(t *testing.T) {
 
 	var d Direction = East
@@ -40,6 +43,7 @@ func TestReverseDirectonEast(t *testing.T) {
 	}
 }
 
+//Test if a direction is properly reversed
 func TestReverseDirectonWest(t *testing.T) {
 
 	var d Direction = West
@@ -52,6 +56,7 @@ func TestReverseDirectonWest(t *testing.T) {
 	}
 }
 
+//Test if a direction is properly reversed
 func TestReverseStringDirectonNorth(t *testing.T) {
 
 	var d = "noRth"
@@ -64,6 +69,7 @@ func TestReverseStringDirectonNorth(t *testing.T) {
 	}
 }
 
+//Test if a direction is properly reversed
 func TestReverseStringDirectonSouth(t *testing.T) {
 
 	var d = "SoutH"
@@ -76,6 +82,7 @@ func TestReverseStringDirectonSouth(t *testing.T) {
 	}
 }
 
+//Test if a direction is properly reversed
 func TestReverseStringDirectonEast(t *testing.T) {
 
 	var d = "EAST"
@@ -88,6 +95,7 @@ func TestReverseStringDirectonEast(t *testing.T) {
 	}
 }
 
+//Test if a direction is properly reversed
 func TestReverseStringDirectonWest(t *testing.T) {
 
 	var d = "weST"
@@ -100,17 +108,8 @@ func TestReverseStringDirectonWest(t *testing.T) {
 	}
 }
 
-// func (c *City) AddOccupant(a *Alien) bool {
-// 	if len(c.occupants) < 2 {
-// 		//Add if Alien not in the map
-// 		if _, ok := c.occupants[a.Name]; !ok {
-// 			c.occupants[a.Name] = a
-// 			return true
-// 		}
-
-// 	}
-// 	return false
-// }
+//Test if Adding occupants to city Map
+//it doesnt exceed the limit of 2
 func TestAddAlienOccupantsToCity(t *testing.T) {
 
 	var city = City{Name: "Testopolis", occupants: make(Occupants)}
@@ -131,6 +130,7 @@ func TestAddAlienOccupantsToCity(t *testing.T) {
 	}
 }
 
+//Test when 0 occpuants is passed as param
 func TestAddZeroAlienOccupantsToCity(t *testing.T) {
 
 	var city = City{Name: "Testopolis", occupants: make(Occupants)}
@@ -145,6 +145,7 @@ func TestAddZeroAlienOccupantsToCity(t *testing.T) {
 	}
 }
 
+//Test addition and then removal
 func TestAddRemoveAlienOccupantsToCity(t *testing.T) {
 
 	var city = City{Name: "Testopolis", occupants: make(Occupants)}
@@ -166,6 +167,7 @@ func TestAddRemoveAlienOccupantsToCity(t *testing.T) {
 	}
 }
 
+//Test removal wihout addition
 func TestRemoveAlienOccupantsToCityWhenZeroAdded(t *testing.T) {
 
 	var city = City{Name: "Testopolis", occupants: make(Occupants)}
@@ -185,6 +187,8 @@ func TestRemoveAlienOccupantsToCityWhenZeroAdded(t *testing.T) {
 	}
 }
 
+//Test count of all aliens added to city should not exceed 2
+//even when adding more then 2
 func TestCountAlienOccupantsToCity(t *testing.T) {
 
 	var city = City{Name: "Testopolis", occupants: make(Occupants)}
@@ -205,10 +209,9 @@ func TestCountAlienOccupantsToCity(t *testing.T) {
 	}
 }
 
-func TestRandomNeighboutNoRoadCity(t *testing.T) {
-
+//Test if neghbout has no roads going out
+func TestRandomNeighbourNoRoad(t *testing.T) {
 	//Create Linked cities
-	//Adding 0 Neigbour for each city1 and test
 	var city1 = &City{Name: "Testopolis", occupants: make(Occupants)}
 	var city2 = &City{Name: "Testabad", occupants: make(Occupants)}
 	var _ = &City{Name: "Testmopoliton", occupants: make(Occupants), North: &Road{DirName: North, DestCity: city1},
@@ -218,6 +221,58 @@ func TestRandomNeighboutNoRoadCity(t *testing.T) {
 
 	if neighbour != nil {
 		t.Fatalf(`city.RandomNeighbour(%v) = %v, %v, want %v, error`, nil, neighbour,
-			"More then 2 Occupants added", nil)
+			"Neighbour should not have been found", nil)
+	}
+}
+
+//Test when only road leads out of city
+func TestRandomNeighbourOneRoad(t *testing.T) {
+
+	//Create Linked cities
+	var city1 = &City{Name: "Testopolis", occupants: make(Occupants)}
+	var city2 = &City{Name: "Testabad", occupants: make(Occupants)}
+	var city3 = &City{Name: "Testmopoliton", occupants: make(Occupants), North: &Road{DirName: North, DestCity: city1},
+		South: &Road{DirName: South, DestCity: city2}}
+
+	neighbour, _ := city3.RandomNeighbour()
+
+	if neighbour == nil {
+		t.Fatalf(`city.RandomNeighbour(%v) = %v, %v, want %v, error`, 1, neighbour,
+			"1 Neighbour should have been found", 1)
+	}
+}
+
+//Test when 2 roads lead out of city
+func TestRandomNeighbourTwoRoad(t *testing.T) {
+
+	//Create Linked cities
+	var city1 = &City{Name: "Testopolis", occupants: make(Occupants)}
+	var city2 = &City{Name: "Testabad", occupants: make(Occupants)}
+	var city3 = &City{Name: "Testmopoliton", occupants: make(Occupants), North: &Road{DirName: North, DestCity: city1},
+		South: &Road{DirName: South, DestCity: city2}}
+
+	neighbour, _ := city3.RandomNeighbour()
+
+	if neighbour == nil {
+		t.Fatalf(`city.RandomNeighbour(%v) = %v, %v, want %v, error`, 1, neighbour,
+			"1 Neighbour should have been found", 1)
+	}
+}
+
+//Test when roads leads to a city with 2 occupants
+func TestRandomNeighbourOneRoadTwoOccupants(t *testing.T) {
+
+	//Create Linked cities
+	var city1 = &City{Name: "Testopolis", occupants: make(Occupants)}
+	city1.AddOccupant(&Alien{Name: "1"})
+	city1.AddOccupant(&Alien{Name: "2"})
+
+	var city2 = &City{Name: "Testmopoliton", occupants: make(Occupants), North: &Road{DirName: North, DestCity: city1}}
+
+	neighbour, _ := city2.RandomNeighbour()
+
+	if neighbour != nil {
+		t.Fatalf(`city.RandomNeighbour(%v) = %v, %v, want %v, error`, nil, neighbour,
+			"0 Neighbour should have been found", nil)
 	}
 }

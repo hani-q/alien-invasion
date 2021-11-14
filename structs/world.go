@@ -48,7 +48,7 @@ func (w World) String() string {
 }
 
 //Open the Map file path provided and populatre the World struct
-func LoadWorldMap(fileName string, alien_count int) *World {
+func LoadWorldMap(fileName string) *World {
 	file, err := os.Open(fileName)
 	if isError(err) {
 		os.Exit(1)

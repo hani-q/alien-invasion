@@ -1,0 +1,10 @@
+1 north=2
+2 east=3
+3 north=4
+4 east=5
+5 north=6
+6 east=7
+7 north=8
+8 east=9
+9 north=10
+10 east=1

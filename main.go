@@ -41,7 +41,7 @@ func main() {
 
 	//Load the map.txt file into the Map pf world
 	log.Info("Loading world from Map file", *inputMapPathStr)
-	xWorld := structs.LoadWorldMap(*inputMapPathStr, alienCount)
+	xWorld := structs.LoadWorldMap(*inputMapPathStr)
 
 	//Spawn the Aliens and assign each to a unique and random city
 	xWorld.PlaceTheAliens(alienCount)

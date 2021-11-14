@@ -4,7 +4,7 @@ import (
 	"testing"
 )
 
-// Capitalises the first character of a string
+// Test when aliens are with less count
 func TestSpawnAliensZeroPanic(t *testing.T) {
 	defer func() {
 		if r := recover(); r == nil {
