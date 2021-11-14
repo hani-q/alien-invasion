@@ -34,8 +34,9 @@ func main() {
 
 	//One alien will roam the world endlessly, since no City will be destroyed
 	if alienCount < 2 {
-		_ = fmt.Errorf("too few aliens (%v) for simulation, what will a lonely alien do", alienCount)
-		os.Exit(1)
+		msg := fmt.Sprintf("too few aliens (%v) for simulation, what will a lonely alien do", alienCount)
+		_ = fmt.Errorf(msg)
+		panic(msg)
 	}
 
 	//Load the map.txt file into the Map pf world

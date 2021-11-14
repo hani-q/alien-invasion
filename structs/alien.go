@@ -130,6 +130,12 @@ func (a *Alien) Wander(wg *sync.WaitGroup, maxMoves int) {
 //same city
 func SpawnAliens(alienCount int) []*Alien {
 
+	if alienCount < 2 {
+		msg := "Error: Alient count cannot be less then 2"
+		log.Error(msg)
+		panic(msg)
+	}
+
 	//Get fancy alien names from this NameGenerator library
 	seed := time.Now().UTC().UnixNano()
 	nameGenerator := namegenerator.NewNameGenerator(seed)

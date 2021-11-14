@@ -3,6 +3,7 @@ package structs
 import (
 	"fmt"
 	"regexp"
+	"strings"
 	"sync"
 )
 
@@ -36,6 +37,7 @@ func (d Direction) ReverseDirecton() Direction {
 
 //Helper function to reverse the given direction in string format
 func ReverseStringDirecton(dir string) string {
+	dir = strings.ToLower(dir)
 	switch dir {
 	case "north":
 		return "south"
