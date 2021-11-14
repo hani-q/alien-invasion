@@ -57,20 +57,19 @@ the assumptions you are making."*
 
 ****Assumptions****
 
-1. Each city name is unique. if a city is repeated in the world file, the last entry will take presedence.
+1. Each city name is unique.
 2. City name can be any string literal. "1" is also a valid city name. Who are we to judge X-worldlings.
-3. Each city can only have one neghbouring city in one direction. 
-4. Any direction that is not the 4 standard Cardinal directions will be ignored.
-5. If "Foo" is to the North of "Baz". Then "Baz" is to the South of "Foo". So adding a link one way.. it will be added both ways between both cities.
-6. If "Foo" is destroyed its North-ward road to "Baz" is destroyed. "Baz"'s Southward road to "Foo" is also destroyed.
-7. Aliens when the arrive on X-World. avoid going to any city that already has an alien. Meaning on the start of program each city can at max have 1 alien and at min have 0.
-8. Each city can only handle 2 aliens. these guys are Humongous. So if an Alien is TRAPPED if all roads are destroyed OR all available neighbors are full
-9. Battle in each city will take 7 seconds
-10. Alien can go back to the city it just came from.
-11. Aliens cannot be greater then the Count of Cities. So in best case sceanrio num Aliens === num Cities.
-12. Atleast 2 Aliens should descend upon X-World
-13. World file will atleast one direction against a mentioned city. This can lead to a problem if One alien has a Road t a city that only has  Road back. It is the Aliens fault for being stupid and getting off-road
-14. Each Alien has a different pace with which it Crawls.. Some are young .. some are old
+3. Each city can only have one neghbouring city in one direction. Hence the GRID
+4. If "Foo" is to the North of "Baz". Then "Baz" is to the South of "Foo". So adding a link one way.. it will be added both ways between both cities.
+5. If "Foo" is destroyed its North-ward road to "Baz" is destroyed. "Baz"'s Southward road to "Foo" is also removed.
+6. Aliens when the arrive on X-World. Avoided going to any city that already had an alien. Meaning on the start of program each city will have 1 alien and at min have 0.
+7. Each city can only handle 2 aliens. these guys are Humongous. 
+8. An Alien is TRAPPED if all roads are destroyed OR all available neighbors are full
+9.  Alien can go back to the city it just came from.
+10. Aliens cannot be greater then the Count of Cities. So in best case sceanrio num Aliens === num Cities.
+11. Atleast 2 Aliens should descend upon X-World
+12. World file will atleast one direction against a mentioned city. This can lead to a problem if One alien has a Road to a city that only has a Road back. It is the Aliens fault for being stupid and getting off-road
+13. Each Alien has a different pace with which it Crawls.. Some are young .. some are old
 
 ***How to Run***
 ```
