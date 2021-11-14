@@ -7,6 +7,7 @@ import (
 
 type Direction string
 
+//Cardinal Directions Enum
 const (
 	X     Direction = "X"
 	North Direction = "North"
@@ -15,10 +16,10 @@ const (
 	West  Direction = " West"
 )
 
+//Will return the Opposite/Reverse Direction of a given
+//Direction... N<->S ... E<->W
 func (d Direction) ReverseDirecton() Direction {
 	switch d {
-	case X:
-		return X
 	case North:
 		return South
 	case South:
@@ -47,11 +48,48 @@ func ReverseStringDirecton(dir string) string {
 	}
 }
 
+type Occupants map[string]*Alien
+
 type City struct {
 	Name                     string
 	North, South, East, West *Road
-	Invader                  *Alien
+	occupants                Occupants
 	mu                       sync.Mutex
+}
+
+func (o Occupants) String() string {
+
+	var occupantNames []string
+	for k := range o {
+		occupantNames = append(occupantNames, k)
+	}
+
+	if len(o) == 1 {
+		return fmt.Sprintf("%v", occupantNames[0])
+	} else {
+		return fmt.Sprintf("%v and %v", occupantNames[0], occupantNames[1])
+	}
+
+}
+
+func (c *City) AddOccupant(a *Alien) bool {
+	if len(c.occupants) < 2 {
+		//Add if Alien not in the map
+		if _, ok := c.occupants[a.Name]; !ok {
+			c.occupants[a.Name] = a
+			return true
+		}
+
+	}
+	return false
+}
+
+func (c *City) RemoveOccupant(name string) {
+	delete(c.occupants, name)
+}
+
+func (c *City) CountOccupants() int {
+	return len(c.occupants)
 }
 
 func (c *City) RandomNeighbour() (*City, string) {
@@ -93,8 +131,14 @@ func (c *City) RandomNeighbour() (*City, string) {
 	}
 
 	if len(availableNeighbours) > 0 {
-		for k, v := range availableNeighbours {
-			return v, k
+		for k, neighbour := range availableNeighbours {
+			//Check if availableNeighbour is already full
+			//Dont go there
+			if neighbour.CountOccupants() == 2 {
+				continue
+			} else {
+				return neighbour, k
+			}
 		}
 	}
 
@@ -104,6 +148,11 @@ func (c *City) RandomNeighbour() (*City, string) {
 
 func (c *City) String() string {
 	return fmt.Sprintf("%v %v %v %v %v", c.Name, c.North.getRoadName(), c.East.getRoadName(), c.West.getRoadName(), c.South.getRoadName())
+}
+
+func (c *City) CityPrint() string {
+
+	return fmt.Sprintf("Occupants(%v):%v, Roads: %v %v %v %v\n", len(c.occupants), c.occupants, c.North.getRoadName(), c.East.getRoadName(), c.West.getRoadName(), c.South.getRoadName())
 }
 
 type Road struct {

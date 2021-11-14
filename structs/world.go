@@ -35,8 +35,8 @@ func (w World) String() string {
 	if w == nil || len(w) == 0 {
 		return "World is Empty!...Generate World Map first"
 	} else {
-		for _, cityData := range w {
-			printData = printData + fmt.Sprintln(cityData)
+		for cityName, cityData := range w {
+			printData = printData + cityName + " " + cityData.CityPrint()
 		}
 
 		return printData
@@ -85,27 +85,36 @@ func LoadWorldMap(fileName string, alien_count int) *World {
 	return &XWorld
 }
 
-func (world World) BringInTheAliens(alien_count int) {
-
+func (world World) PlaceTheAliens(alien_count int) {
 	if len(world) < alien_count {
-		fmt.Println("Aliens cannot live in such a congested (simulated) world..\n Add more cities to World file")
+		msg := "Aliens cannot live in such a congested (simulated) world. Add more cities to World file"
+		fmt.Println(msg)
+		log.Error(msg)
 		os.Exit(1)
 	}
 
-	//Open the dimensional portal and let Zentardi descend from the Sky
+	//Open the dimensional portal and let Aliens descend from the Sky
 	aliens := SpawnAliens(alien_count)
 
-	//Rehabilitate displaced Zentardi in EMPTY cities
+	//Rehabilitate displaced Aliens in EMPTY cities
 	for _, alien := range aliens {
 		for cityName := range world {
-			if world[cityName].Invader == nil {
-				alien.CurrentCity = world[cityName]
-				world[cityName].Invader = alien
+			//Add alien to cities which have 0 occupants
+			if len(world[cityName].occupants) == 0 {
+
+				world[cityName].AddOccupant(alien)
+				log.Infof("Added %v to City %v", alien.Name, cityName)
+				//Tell Alien also about the name of its City
+				//Wish they were more smarter
+				alien.CurrCityName = cityName
+
+				//Update in YellowPages too
+				//This will be used to tell all aliens to start
+				Ayp[alien.Name] = alien
 				break
 			}
 		}
 
-		Ayp[alien.Name] = alien
 	}
 }
 
@@ -118,20 +127,16 @@ func addCityToWorld(cityName string, w World, roadData []string) {
 	//Add the Neigbhour City first in World Map if not already added
 	_, ok := w[neighbouringCityName]
 	if !ok {
-		w[neighbouringCityName] = &City{Name: neighbouringCityName}
+		w[neighbouringCityName] = &City{Name: neighbouringCityName, occupants: make(map[string]*Alien)}
 	}
 	neighbourCity = w[neighbouringCityName]
 
 	//Add the City to the World Map if not already added
-	//Repeated cities will be ignored
+	//Repeated cities will be updated with latest info
 	if entry, ok := w[cityName]; ok {
-
 		currentCity = entry
-
 	} else {
-		var cityData City
-
-		cityData.Name = cityName
+		var cityData City = City{Name: cityName, occupants: make(map[string]*Alien)}
 		w[cityName] = &cityData
 		currentCity = w[cityName]
 	}
