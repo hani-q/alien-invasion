@@ -45,14 +45,18 @@ func main() {
 	//Spawn the Aliens and assign each to a unique and random city
 	xWorld.PlaceTheAliens(alienCount)
 
-	//Log the state of the Wold before the mayhem
+	//Log the state of the Wold after the mayhem
 	log.Info(xWorld)
+	fmt.Printf("\nWorld in peacefull times\n\n")
+	fmt.Println(xWorld)
 
 	//Start the simulation
 	startSimulation(numIterations)
 
 	//Log the state of the Wold after the mayhem
+	fmt.Printf("\nWhats left after the Mayhem\n\n")
 	fmt.Println(xWorld)
+	log.Info(xWorld)
 
 	//Save it as final_map.txt
 

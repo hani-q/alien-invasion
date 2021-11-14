@@ -2,6 +2,7 @@ package structs
 
 import (
 	"fmt"
+	"regexp"
 	"sync"
 )
 
@@ -147,11 +148,28 @@ func (c *City) RandomNeighbour() (*City, string) {
 }
 
 func (c *City) String() string {
-	return fmt.Sprintf("%v %v %v %v %v", c.Name, c.North.getRoadName(), c.East.getRoadName(), c.West.getRoadName(), c.South.getRoadName())
+	var roadData string
+	if c.North != nil {
+		roadData += c.North.getRoadName()
+	}
+	if c.South != nil {
+		roadData += c.South.getRoadName()
+	}
+	if c.East != nil {
+		roadData += c.East.getRoadName()
+	}
+	if c.West != nil {
+		roadData += c.West.getRoadName()
+	}
+
+	space := regexp.MustCompile(`[\s\p{Zs}]{2,}`)
+
+	roadData = space.ReplaceAllString(roadData, " ")
+
+	return fmt.Sprintf("%v%s\n", c.Name, roadData)
 }
 
 func (c *City) CityPrint() string {
-
 	return fmt.Sprintf("Occupants(%v):%v, Roads: %v %v %v %v\n", len(c.occupants), c.occupants, c.North.getRoadName(), c.East.getRoadName(), c.West.getRoadName(), c.South.getRoadName())
 }
 
@@ -173,5 +191,5 @@ func (r *Road) getRoadName() string {
 		return ""
 	}
 
-	return fmt.Sprintf("%v=%v", r.DirName, r.DestCity.getCityName())
+	return fmt.Sprintf(" %v=%v", r.DirName, r.DestCity.getCityName())
 }

@@ -35,8 +35,8 @@ func (w World) String() string {
 	if w == nil || len(w) == 0 {
 		return "World is Empty!...Generate World Map first"
 	} else {
-		for cityName, cityData := range w {
-			printData = printData + cityName + " " + cityData.CityPrint()
+		for _, cityData := range w {
+			printData = printData + cityData.String()
 		}
 
 		return printData
