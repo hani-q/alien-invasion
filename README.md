@@ -72,4 +72,19 @@ the assumptions you are making."*
 13. World file will atleast one direction against a mentioned city. This can lead to a problem if One alien has a Road t a city that only has  Road back. It is the Aliens fault for being stupid and getting off-road
 14. Each Alien has a different pace with which it Crawls.. Some are young .. some are old
 
+****How to Run***
+```
+go run .\main.go -aliens=10 -numIterations=100  -world_file="./test/world_medium.txt"
+```
 
+| flags | description | default |
+| ------------- | ------------- | ------------- |
+| aliens | Count of the Aliens that need to be spawend. Should be greater then the cities in the map txt file and not less then 2  | 4| 
+| numIterations  | How many moves an Individual Alien has  | 10000 |
+| world_file  | Sample world map.txt file. Should be the format mentioned in requirements section  | ./test/world_tiny.txt |
+| stdout  | Disabled logging to log.txt file in build/ and starts logging to screen | false |
+
+****How to Test***
+```
+go test -v .\structs\
+```
