@@ -34,6 +34,7 @@ func (d Direction) ReverseDirecton() Direction {
 	}
 }
 
+//Helper function to reverse the given direction in string format
 func ReverseStringDirecton(dir string) string {
 	switch dir {
 	case "north":
@@ -49,12 +50,14 @@ func ReverseStringDirecton(dir string) string {
 	}
 }
 
+//Struct for the Occpying Aliens
+//It is made sure in exposed methods to only add 2
 type Occupants map[string]*Alien
 
 type City struct {
 	Name                     string
 	North, South, East, West *Road
-	occupants                Occupants
+	occupants                Occupants //internal so that nobody canadd more then 2 Aliens
 	mu                       sync.Mutex
 }
 
@@ -73,6 +76,8 @@ func (o Occupants) String() string {
 
 }
 
+//Welcomes the Alien into the city. If the City isnt full
+//Arent all cities full anyways
 func (c *City) AddOccupant(a *Alien) bool {
 	if len(c.occupants) < 2 {
 		//Add if Alien not in the map
@@ -85,14 +90,20 @@ func (c *City) AddOccupant(a *Alien) bool {
 	return false
 }
 
+//Remove the Alien Occupant
 func (c *City) RemoveOccupant(name string) {
 	delete(c.occupants, name)
 }
 
+//Returns count of occupying aliens in the city
 func (c *City) CountOccupants() int {
 	return len(c.occupants)
 }
 
+//Returns a random neighbour of the City.
+//only returns a non nill value if no Roads Lead out of city
+//or if the available neighbours are not full
+//Nobody should move to a city that has 2 Aliens fighting it out
 func (c *City) RandomNeighbour() (*City, string) {
 
 	availableNeighbours := make(map[string]*City)
@@ -147,6 +158,8 @@ func (c *City) RandomNeighbour() (*City, string) {
 
 }
 
+//Prints City in input map file format
+//Bar south=Foo west=Bee
 func (c *City) String() string {
 	var roadData string
 	if c.North != nil {
@@ -162,13 +175,15 @@ func (c *City) String() string {
 		roadData += c.West.getRoadName()
 	}
 
+	//Remove any double spaces
 	space := regexp.MustCompile(`[\s\p{Zs}]{2,}`)
-
 	roadData = space.ReplaceAllString(roadData, " ")
 
 	return fmt.Sprintf("%v%s\n", c.Name, roadData)
 }
 
+//Alternate Print used in Debugging.
+//Shows a city, its roads and its aliens
 func (c *City) CityPrint() string {
 	return fmt.Sprintf("Occupants(%v):%v, Roads: %v %v %v %v\n", len(c.occupants), c.occupants, c.North.getRoadName(), c.East.getRoadName(), c.West.getRoadName(), c.South.getRoadName())
 }

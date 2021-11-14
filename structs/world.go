@@ -11,6 +11,8 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
+//This is used only to keep trakc of All spawn Aliens
+//so that we can loop over these and instruct them to Wander
 type AlienYellowPages map[string]*Alien
 
 var Ayp AlienYellowPages = make(AlienYellowPages)
@@ -24,10 +26,12 @@ func (Ayp AlienYellowPages) String() string {
 	return strings.Join(strkeys, ",")
 }
 
+//Map of the World.. in every sense of the word
 type World map[string]*City
 
 var XWorld = make(World)
 
+//Prints the Map world in the same format as Input file
 func (w World) String() string {
 
 	var printData string
@@ -43,6 +47,7 @@ func (w World) String() string {
 	}
 }
 
+//Open the Map file path provided and populatre the World struct
 func LoadWorldMap(fileName string, alien_count int) *World {
 	file, err := os.Open(fileName)
 	if isError(err) {
@@ -85,6 +90,8 @@ func LoadWorldMap(fileName string, alien_count int) *World {
 	return &XWorld
 }
 
+//Aliens are habiliated in the world. Each alien is provided with a caring city
+//Each city is only one given one Alien
 func (world World) PlaceTheAliens(alien_count int) {
 	if len(world) < alien_count {
 		msg := "Aliens cannot live in such a congested (simulated) world. Add more cities to World file"
@@ -111,13 +118,14 @@ func (world World) PlaceTheAliens(alien_count int) {
 				//Update in YellowPages too
 				//This will be used to tell all aliens to start
 				Ayp[alien.Name] = alien
-				break
+				break //inner loop break
 			}
 		}
 
 	}
 }
 
+//The parsed cities that are read from map are added to the Map struct
 func addCityToWorld(cityName string, w World, roadData []string) {
 
 	neighbouringCityName, neighbourDirection := roadData[1], roadData[0]
@@ -154,6 +162,7 @@ func addCityToWorld(cityName string, w World, roadData []string) {
 	addNeighbourInfo(neighbourCity, currentCity, ReverseStringDirecton(neighbourDirection))
 }
 
+//Adds the Neighout Info as Road struct for the passed Cardinal direction
 func addNeighbourInfo(c *City, neigbourCity *City, neighboutDirection string) {
 	switch neighboutDirection {
 	case "north":
@@ -167,6 +176,7 @@ func addNeighbourInfo(c *City, neigbourCity *City, neighboutDirection string) {
 	}
 }
 
+//Wipes the world of the City. Does it kill the X-Worldings living there. Not sure
 func (w World) DeleteCity(cityName string) {
 
 	if entry, ok := w[cityName]; ok {
