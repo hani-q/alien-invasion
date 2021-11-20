@@ -15,7 +15,7 @@ func TestLoadWorldMap(t *testing.T) {
 	LoadWorldMap(testMapFilePath)
 
 	//XWorld the global world var should be updated
-	cityCount := len(XWorld)
+	cityCount := XWorld.GetCityCount()
 
 	if cityCount != wanted {
 		t.Fatalf(`LoadWorldMap(%v) = %v, %v, want %v, error`, testMapFilePath, cityCount,
@@ -32,14 +32,14 @@ func TestWorldCityLinks(t *testing.T) {
 	// 1 is to east of 10 & 10 is to the west of 1
 	testMapFilePath := "../test/world_test_ten.txt"
 
-	LoadWorldMap(testMapFilePath)
+	xWorld := LoadWorldMap(testMapFilePath)
 
-	fmt.Println(XWorld)
-	direction1 := XWorld["1"].West.DirName
-	direction10 := XWorld["10"].East.DirName
+	fmt.Println(xWorld)
+	direction1 := xWorld.Data["1"].West.DirName
+	direction10 := xWorld.Data["10"].East.DirName
 
-	name1 := XWorld["1"].West.DestCity.Name
-	name10 := XWorld["10"].East.DestCity.Name
+	name1 := XWorld.Data["1"].West.DestCity.Name
+	name10 := XWorld.Data["10"].East.DestCity.Name
 
 	if direction1 != West {
 		t.Fatalf(`LoadWorldMap(%v) %v , %v, want %v, error`, testMapFilePath, direction1, West,
@@ -70,16 +70,16 @@ func TestDeleteCityAndLinks(t *testing.T) {
 	// 1 is to east of 10 & 10 is to the west of 1
 	testMapFilePath := "../test/world_test_ten.txt"
 
-	LoadWorldMap(testMapFilePath)
+	xWorld := LoadWorldMap(testMapFilePath)
 
-	fmt.Println(XWorld)
-	city1 := XWorld["1"]
-	city10 := XWorld["10"]
+	fmt.Println(xWorld)
+	city1 := xWorld.Data["1"]
+	city10 := xWorld.Data["10"]
 
 	city10Name := city10.Name
 
 	//Delete City 10 and see if City 1 has 1 neighbout left or not
-	XWorld.DeleteCity(city10Name)
+	xWorld.DeleteCity(city10Name)
 
 	if city1.East != nil {
 		t.Fatalf(`DeleteCity(%v) %v, %v, want %v, error`, "city10", nil, city10Name,
@@ -94,18 +94,21 @@ func TestPlaceAliensCount(t *testing.T) {
 	//We know the test file has 10 cities
 	testMapFilePath := "../test/world_test_ten.txt"
 
-	LoadWorldMap(testMapFilePath)
-
 	alienCount := 10
-	XWorld.PlaceTheAliens(alienCount)
+	xWorld := LoadWorldMap(testMapFilePath)
+	queen := Queen{Children: make(map[string]*Alien), QueenChan: make(chan AlienLanguage)}
+
+	//Spew the Queen Mothers Eggs the Entire X-World
+	queen.LayEggs(alienCount, xWorld)
+
 	placedAliens := 0
 
-	for _, cityData := range XWorld {
-		placedAliens += cityData.CountOccupants()
-		if cityData.CountOccupants() > 1 {
-			t.Fatalf(`PlaceTheAliens(%v) = %v, %v, want %v, error`, alienCount, placedAliens,
-				"Aliens placed in world should be 10", alienCount)
+	for _, cityData := range xWorld.Data {
+
+		if cityData.Occupant != nil {
+			placedAliens++
 		}
+
 	}
 
 	if alienCount != placedAliens {
@@ -114,25 +117,33 @@ func TestPlaceAliensCount(t *testing.T) {
 	}
 }
 
-//Test when aliens are placed in a world each one is not duplicated
+// //Test when aliens are placed in a world each one is not duplicated
 func TestPlaceAliensDuplication(t *testing.T) {
 
 	//We know the test file has 10 cities
 	testMapFilePath := "../test/world_test_ten.txt"
 
-	LoadWorldMap(testMapFilePath)
+	xWorld := LoadWorldMap(testMapFilePath)
 
 	alienCount := 10
-	XWorld.PlaceTheAliens(alienCount)
+	queen := Queen{Children: make(map[string]*Alien), QueenChan: make(chan AlienLanguage)}
+
+	//Spew the Queen Mothers Eggs the Entire X-World
+	queen.LayEggs(alienCount, xWorld)
+
 	placedAlienNames := make([]string, alienCount)
 
-	for _, cityData := range XWorld {
-		for k := range cityData.occupants {
-			if checkAlienInArray(placedAlienNames, k) {
+	for _, cityData := range xWorld.Data {
+		if cityData.Occupant != nil {
+			alieName := cityData.Occupant.Name
+			if checkAlienInArray(placedAlienNames, alieName) {
 				t.Fatalf(`PlaceTheAliens(%v) = %v, %v, want %v, error`, alienCount, true, false,
 					"Aliens placed in world should be unique")
+			} else {
+				placedAlienNames = append(placedAlienNames, alieName)
 			}
 		}
+
 	}
 
 }

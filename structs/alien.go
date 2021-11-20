@@ -3,149 +3,155 @@ package structs
 import (
 	"fmt"
 	"math/rand"
-	"sync"
 	"time"
 
-	"github.com/goombaio/namegenerator"
-	"github.com/hani-q/alien-invasion/util"
 	log "github.com/sirupsen/logrus"
+)
+
+const ALIEN_TAG = "ALIEN"
+
+type Status string
+
+//Cardinal Directions Enum
+const (
+	HATCHED   Status = "HATCHED"
+	EXHASUTED Status = "EXHASUTED"
+	DEAD      Status = "DEAD"
+	TRAPPED   Status = "TRAPPED"
 )
 
 type Alien struct {
 	Name         string
+	moveCount    int
+	PersonalChan chan string //incoming channel
 	CurrCityName string
 	prevCityName string //Name of the previosuly viisted City
-	Trapped      bool   //When no roads lead out of a city this is set
+	status       Status //When no roads lead out of a city this is set
+
 }
 
-func (a *Alien) String() string {
-	return fmt.Sprintf("%v: Address=%v, Trapped=%v", a.Name, a.CurrCityName, a.Trapped)
-}
-
-func (a *Alien) Wander(wg *sync.WaitGroup, maxMoves int) {
+func (a *Alien) Hatch(maxMoves int, queenChan chan<- AlienLanguage) {
 	//Counter to track an Alien that is stuck between 2 cities
 	//After counter is 0. Alien wont move anymore
 
-	log.Infof("Alien[%v] in '%v' has started to Wander\n", a.Name, a.CurrCityName)
-	for i := 1; i <= maxMoves; i++ {
+	a.status = HATCHED
+	log.Infof("%v: [%v] in '%v' has Hatched", ALIEN_TAG, a.Name, a.CurrCityName)
 
-		//Sleep a Random amount to mimic each alien moving to a new city
-		//faster or slower
-		time.Sleep(time.Duration(rand.Intn(100)) * time.Millisecond)
+	go func() {
+		ticker := time.NewTicker(time.Duration(rand.Intn(500)) * time.Millisecond)
+		for {
+			select {
+			case cmd := <-a.PersonalChan:
+				log.Infof("%v: [%v] commanded to {%v}", ALIEN_TAG, a.Name, cmd)
+				switch cmd {
+				case "die":
+					a.status = DEAD
+					queenChan <- AlienLanguage{AlienName: a.Name, AlienStatus: a.status}
+					return
+				}
 
-		//Check if City exist in World Map
-		if _, ok := XWorld[a.CurrCityName]; !ok {
-			//City has been Destoryed.. Alien is also Dead
-			break
+			case <-ticker.C:
+				a.moveCount = a.moveCount + 1
+				if a.moveCount == maxMoves {
+					a.status = EXHASUTED
+					log.Infof("%v: [%v] => is **EXHASUTED** in '%v', moves(%v)", ALIEN_TAG, a.Name, a.CurrCityName, a.moveCount)
+					queenChan <- AlienLanguage{AlienName: a.Name, AlienStatus: a.status}
+					return
+				}
+
+				//Move to next posible City
+				//Get a random direction
+
+				currCityPtr := XWorld.GetCity(a.CurrCityName)
+				if currCityPtr == nil {
+					//City has been Destoryed
+					return
+				}
+				currCityPtr.mu.Lock()
+
+				//Check if Alien is Stuck moving Back and Forth between a City
+				//Can happen if Alien is between 2 cities that are only linked to each other
+
+				//This will return a nil if all roads destroyed OR
+				//if Available Cities are full (and battle is ongoing in those cities)
+				//means we are trapped
+
+				nextCityPtr, nextDirection := currCityPtr.RandomNeighbour()
+
+				//If Next City is Available lets move there
+				//Take lock of Current City & next City
+				//to avoid anyone else moving In & to avoid anyone else moving onm from nextCity
+
+				if nextCityPtr == nil {
+
+					//Update Alien to TRAPPED status
+					//and end this Blood lust
+					a.status = TRAPPED
+					log.Infof("%v: [%v] => is **TRAPPED** in '%v', moves(%v)", ALIEN_TAG, a.Name, a.CurrCityName, a.moveCount)
+					queenChan <- AlienLanguage{AlienName: a.Name, AlienStatus: a.status}
+					return
+				} else {
+					nextCityPtr.mu.Lock()
+
+					//We have 2 scenarios, next city has 0 occupants
+					//OR it has 1 occupants
+
+					nextAlien := nextCityPtr.Occupant
+
+					if nextAlien == nil {
+						//0 Occupants await us
+						//Peacefull transfer to new city
+
+						//Track the previous city.
+						a.prevCityName = a.CurrCityName
+
+						//Update next cities names
+						a.CurrCityName = nextCityPtr.Name
+
+						//Update the current cities occupants
+						currCityPtr.Occupant = nil
+
+						//Add urself to next Cities occupants
+						nextCityPtr.Occupant = a
+
+						log.Infof("%v [%v] => **MOVED** %v:%v from '%v', moves(%v)",
+							ALIEN_TAG, a.Name, nextDirection, nextCityPtr.Name, currCityPtr.Name, a.moveCount)
+
+						nextCityPtr.mu.Unlock()
+						currCityPtr.mu.Unlock()
+
+					} else {
+
+						//This will end in a Bloody fight between the 2 that can end both of them and the next city
+						//Remove all references of the Alien from the current city
+						a.CurrCityName = ""
+
+						//Update the current cities occupants
+						currCityPtr.Occupant = nil
+
+						//Add Alien to next cities occupants,Shouldnt make a difference
+						//Add urself to next Cities occupants
+						nextCityPtr.Occupant = nil
+
+						log.Infof("%v [%v] => **FIGHTING** %v after moving %v:%v from '%v', moves(%v)",
+							ALIEN_TAG, a.Name, nextAlien.Name, nextDirection, nextCityPtr.Name, currCityPtr.Name, a.moveCount)
+						nextAlien.PersonalChan <- "die"
+
+						fmt.Printf("%v has been destroyed by %v and %v\n", nextCityPtr.Name, a.Name, nextAlien.Name)
+						a.status = DEAD
+						log.Infof("%v [%v] & [%v] are **DEAD** and took '%v' with them", ALIEN_TAG, a.Name, nextAlien.Name, nextCityPtr.Name)
+
+						//Initial Delete of City from XWorld
+						XWorld.DeleteCity(nextCityPtr.Name)
+						queenChan <- AlienLanguage{AlienName: a.Name, AlienStatus: a.status}
+						nextCityPtr.mu.Unlock()
+						currCityPtr.mu.Unlock()
+						return
+					}
+				}
+			}
+
 		}
+	}()
 
-		//Move to next posible City
-		//Get a random direction
-		currCityPtr := XWorld[a.CurrCityName]
-
-		//Check if Alien is Stuck moving Back and Forth between a City
-		//Can happen if Alien is between 2 cities that are only linked to each other
-
-		//This will return a nil if all roads destroyed OR
-		//if Available Cities are full (and battle is ongoing in those cities)
-		//means we are trapped
-		nextCityPtr, nextDirection := currCityPtr.RandomNeighbour()
-
-		if nextCityPtr == nil {
-			//Update Alien to TRAPPED status
-			//and end this Blood lust
-			a.Trapped = true
-			log.Infof("Alien[%v] => is **TRAPPED** in '%v' === ITER:[%v]\n", a.Name, a.CurrCityName, i)
-			break
-		}
-
-		//If Next City is Available lets move there
-		//Take lock of Current City & next City
-		//to avoid anyone else moving In & to avoid anyone else moving onm from nextCity
-		currCityPtr.mu.Lock()
-		nextCityPtr.mu.Lock()
-
-		//We have 2 scenarios, next city has 0 occupants
-		//OR it has 1 occupants
-
-		occuantCount := nextCityPtr.CountOccupants()
-
-		if occuantCount == 0 {
-			//0 Occupants await us
-			//Peacefull transfer
-
-			//Track the previous city.
-			a.prevCityName = a.CurrCityName
-
-			//Update next cities names
-			a.CurrCityName = nextCityPtr.Name
-
-			//Update the current cities occupants
-			currCityPtr.RemoveOccupant(a.Name)
-
-			//Add urself to next Cities occupants
-			nextCityPtr.AddOccupant(a)
-
-			log.Infof("Alien[%v] => **MOVED** %v:%v from '%v' === ITER:[%v]\n",
-				a.Name, nextDirection, nextCityPtr.Name, currCityPtr.Name, i)
-
-			nextCityPtr.mu.Unlock()
-			currCityPtr.mu.Unlock()
-
-		} else if occuantCount == 1 {
-			//This will end in a Bloody fight between the 2 that can end both of them and the next city
-			//Remove all references of the Alien from the current city
-
-			a.CurrCityName = ""
-
-			//Update the current cities occupants
-			currCityPtr.RemoveOccupant(a.Name)
-
-			//Add Alien to next cities occupants,Shouldnt make a difference
-			//Add urself to next Cities occupants
-			nextCityPtr.AddOccupant(a)
-			log.Infof("Alien[%v] => **MOVED** %v:%v from '%v' === ITER:[%v]\n",
-				a.Name, nextDirection, nextCityPtr.Name, currCityPtr.Name, i)
-
-			fmt.Printf("%v has been destroyed by %v\n", nextCityPtr.Name, nextCityPtr.occupants)
-			log.Infof("Alien[%v] are **DEAD** and took '%v' with them\n", nextCityPtr.occupants, nextCityPtr.Name)
-
-			//Release the locks
-			nextCityPtr.mu.Unlock()
-			currCityPtr.mu.Unlock()
-
-			//Initial Delete of City from XWorld
-			XWorld.DeleteCity(nextCityPtr.Name)
-
-		}
-
-	}
-
-	wg.Done()
-}
-
-//Instanitiate the aliens with count provided in cli Args
-//Each alien will be placed in a loving and caring city
-//It will be made sure that no other alien will be present in the
-//same city
-func SpawnAliens(alienCount int) []*Alien {
-
-	if alienCount < 2 {
-		msg := "Error: Alient count cannot be less then 2"
-		log.Error(msg)
-		panic(msg)
-	}
-
-	//Get fancy alien names from this NameGenerator library
-	seed := time.Now().UTC().UnixNano()
-	nameGenerator := namegenerator.NewNameGenerator(seed)
-
-	//Keep a track of Spawned Aliens
-	//This struct will be used by start simulation function to
-	//Launch the aliens
-	var result []*Alien = make([]*Alien, alienCount)
-	for i := 0; i < alienCount; i++ {
-		result[i] = &Alien{Name: util.Capitalise(nameGenerator.Generate())}
-	}
-	return result
 }

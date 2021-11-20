@@ -4,42 +4,42 @@ import (
 	"bufio"
 	"fmt"
 	"os"
-	"reflect"
 	"strings"
+	"sync"
 
 	"github.com/hani-q/alien-invasion/util"
-	log "github.com/sirupsen/logrus"
 )
 
-//This is used only to keep trakc of All spawn Aliens
-//so that we can loop over these and instruct them to Wander
-type AlienYellowPages map[string]*Alien
+// //This is used only to keep trakc of All spawn Aliens
+// //so that we can loop over these and instruct them to Wander
+// type AlienYellowPages map[string]*Alien
 
-var Ayp AlienYellowPages = make(AlienYellowPages)
+// var Ayp AlienYellowPages = make(AlienYellowPages)
 
-func (Ayp AlienYellowPages) String() string {
-	keys := reflect.ValueOf(Ayp).MapKeys()
-	strkeys := make([]string, len(keys))
-	for i := 0; i < len(keys); i++ {
-		strkeys[i] = keys[i].String()
-	}
-	return strings.Join(strkeys, ",")
-}
+// func (Ayp AlienYellowPages) String() string {
+// 	keys := reflect.ValueOf(Ayp).MapKeys()
+// 	strkeys := make([]string, len(keys))
+// 	for i := 0; i < len(keys); i++ {
+// 		strkeys[i] = keys[i].String()
+// 	}
+// 	return strings.Join(strkeys, ",")
+// }
 
 //Map of the World.. in every sense of the word
-type World map[string]*City
+type World struct {
+	Data map[string]*City
+	mu   sync.Mutex // guards
+}
 
-var XWorld = make(World)
+var XWorld = World{Data: make(map[string]*City)}
 
 //Prints the Map world in the same format as Input file
-func (w World) String() string {
-
+func (w *World) String() string {
 	var printData string
-
-	if w == nil || len(w) == 0 {
+	if w.Data == nil || len(w.Data) == 0 {
 		return "World is Empty!...Generate World Map first"
 	} else {
-		for _, cityData := range w {
+		for _, cityData := range w.Data {
 			printData = printData + cityData.String()
 		}
 
@@ -47,11 +47,25 @@ func (w World) String() string {
 	}
 }
 
+func (w *World) GetCityCount() int {
+	w.mu.Lock()
+	defer w.mu.Unlock()
+	return len(w.Data)
+}
+
+func (w *World) GetCity(name string) *City {
+	w.mu.Lock()
+	defer w.mu.Unlock()
+	return w.Data[name]
+}
+
 //Open the Map file path provided and populatre the World struct
-func LoadWorldMap(fileName string) *World {
-	file, err := os.Open(fileName)
+func LoadWorldMap(filePath string) *World {
+	file, err := os.Open(filePath)
 	if isError(err) {
-		os.Exit(1)
+		msg := fmt.Sprintf("cannot open %v", filePath)
+		_ = fmt.Errorf(msg)
+		panic(msg)
 	}
 	defer file.Close()
 
@@ -79,74 +93,38 @@ func LoadWorldMap(fileName string) *World {
 				// Making sure City name in file is always begins with a Cap
 				roadData[1] = util.Capitalise(roadData[1])
 
-				addCityToWorld(cityName, XWorld, roadData)
+				addCityToWorld(cityName, &XWorld, roadData)
 			}
 		}
 	}
-
-	//Print Statistics about the cities
-	log.Infof("%v cities have been loaded from map file", len(XWorld))
 
 	return &XWorld
 }
 
-//Aliens are habiliated in the world. Each alien is provided with a caring city
-//Each city is only one given one Alien
-func (world World) PlaceTheAliens(alien_count int) {
-	if len(world) < alien_count {
-		msg := "Aliens cannot live in such a congested (simulated) world. Add more cities to World file"
-		fmt.Println(msg)
-		log.Error(msg)
-		os.Exit(1)
-	}
-
-	//Open the dimensional portal and let Aliens descend from the Sky
-	aliens := SpawnAliens(alien_count)
-
-	//Rehabilitate displaced Aliens in EMPTY cities
-	for _, alien := range aliens {
-		for cityName := range world {
-			//Add alien to cities which have 0 occupants
-			if len(world[cityName].occupants) == 0 {
-
-				world[cityName].AddOccupant(alien)
-				log.Infof("Added %v to City %v", alien.Name, cityName)
-				//Tell Alien also about the name of its City
-				//Wish they were more smarter
-				alien.CurrCityName = cityName
-
-				//Update in YellowPages too
-				//This will be used to tell all aliens to start
-				Ayp[alien.Name] = alien
-				break //inner loop break
-			}
-		}
-
-	}
-}
-
 //The parsed cities that are read from map are added to the Map struct
-func addCityToWorld(cityName string, w World, roadData []string) {
+func addCityToWorld(cityName string, w *World, roadData []string) {
 
+	w.mu.Lock()
+	defer w.mu.Unlock()
 	neighbouringCityName, neighbourDirection := roadData[1], roadData[0]
 
 	var currentCity, neighbourCity *City
 
 	//Add the Neigbhour City first in World Map if not already added
-	_, ok := w[neighbouringCityName]
+	_, ok := w.Data[neighbouringCityName]
 	if !ok {
-		w[neighbouringCityName] = &City{Name: neighbouringCityName, occupants: make(map[string]*Alien)}
+		w.Data[neighbouringCityName] = &City{Name: neighbouringCityName, Occupant: nil}
 	}
-	neighbourCity = w[neighbouringCityName]
+	neighbourCity = w.Data[neighbouringCityName]
 
 	//Add the City to the World Map if not already added
 	//Repeated cities will be updated with latest info
-	if entry, ok := w[cityName]; ok {
+	if entry, ok := w.Data[cityName]; ok {
 		currentCity = entry
 	} else {
-		var cityData City = City{Name: cityName, occupants: make(map[string]*Alien)}
-		w[cityName] = &cityData
-		currentCity = w[cityName]
+		var cityData City = City{Name: cityName, Occupant: nil}
+		w.Data[cityName] = &cityData
+		currentCity = w.Data[cityName]
 	}
 
 	//Update neighbour info
@@ -177,9 +155,12 @@ func addNeighbourInfo(c *City, neigbourCity *City, neighboutDirection string) {
 }
 
 //Wipes the world of the City. Does it kill the X-Worldings living there. Not sure
-func (w World) DeleteCity(cityName string) {
+func (w *World) DeleteCity(cityName string) {
 
-	if entry, ok := w[cityName]; ok {
+	w.mu.Lock()
+	defer w.mu.Unlock()
+
+	if entry, ok := w.Data[cityName]; ok {
 
 		//Check all of the Cities Roads and go to those Cities
 		//and Delete the reverse road links
@@ -206,7 +187,7 @@ func (w World) DeleteCity(cityName string) {
 	}
 
 	//Delete the City itSelf
-	defer delete(w, cityName)
+	delete(w.Data, cityName)
 }
 
 func isError(err error) bool {

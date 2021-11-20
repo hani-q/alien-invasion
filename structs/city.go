@@ -52,54 +52,11 @@ func ReverseStringDirecton(dir string) string {
 	}
 }
 
-//Struct for the Occpying Aliens
-//It is made sure in exposed methods to only add 2
-type Occupants map[string]*Alien
-
 type City struct {
 	Name                     string
 	North, South, East, West *Road
-	occupants                Occupants //internal so that nobody canadd more then 2 Aliens
+	Occupant                 *Alien //internal so that nobody canadd more then 2 Aliens
 	mu                       sync.Mutex
-}
-
-func (o Occupants) String() string {
-
-	var occupantNames []string
-	for k := range o {
-		occupantNames = append(occupantNames, k)
-	}
-
-	if len(o) == 1 {
-		return fmt.Sprintf("%v", occupantNames[0])
-	} else {
-		return fmt.Sprintf("%v and %v", occupantNames[0], occupantNames[1])
-	}
-
-}
-
-//Welcomes the Alien into the city. If the City isnt full
-//Arent all cities full anyways
-func (c *City) AddOccupant(a *Alien) bool {
-	if len(c.occupants) < 2 {
-		//Add if Alien not in the map
-		if _, ok := c.occupants[a.Name]; !ok {
-			c.occupants[a.Name] = a
-			return true
-		}
-
-	}
-	return false
-}
-
-//Remove the Alien Occupant
-func (c *City) RemoveOccupant(name string) {
-	delete(c.occupants, name)
-}
-
-//Returns count of occupying aliens in the city
-func (c *City) CountOccupants() int {
-	return len(c.occupants)
 }
 
 //Returns a random neighbour of the City.
@@ -107,7 +64,6 @@ func (c *City) CountOccupants() int {
 //or if the available neighbours are not full
 //Nobody should move to a city that has 2 Aliens fighting it out
 func (c *City) RandomNeighbour() (*City, string) {
-
 	availableNeighbours := make(map[string]*City)
 
 	//Make a slice of Neighs that are not NIL and dont match Current City Name
@@ -146,13 +102,7 @@ func (c *City) RandomNeighbour() (*City, string) {
 
 	if len(availableNeighbours) > 0 {
 		for k, neighbour := range availableNeighbours {
-			//Check if availableNeighbour is already full
-			//Dont go there
-			if neighbour.CountOccupants() == 2 {
-				continue
-			} else {
-				return neighbour, k
-			}
+			return neighbour, k
 		}
 	}
 
@@ -187,7 +137,7 @@ func (c *City) String() string {
 //Alternate Print used in Debugging.
 //Shows a city, its roads and its aliens
 func (c *City) CityPrint() string {
-	return fmt.Sprintf("Occupants(%v):%v, Roads: %v %v %v %v\n", len(c.occupants), c.occupants, c.North.getRoadName(), c.East.getRoadName(), c.West.getRoadName(), c.South.getRoadName())
+	return fmt.Sprintf("Occupant: %v, Roads: %v %v %v %v\n", c.Occupant, c.North.getRoadName(), c.East.getRoadName(), c.West.getRoadName(), c.South.getRoadName())
 }
 
 type Road struct {
@@ -210,3 +160,29 @@ func (r *Road) getRoadName() string {
 
 	return fmt.Sprintf(" %v=%v", r.DirName, r.DestCity.getCityName())
 }
+
+// //Instanitiate the aliens with count provided in cli Args
+// //Each alien will be placed in a loving and caring city
+// //It will be made sure that no other alien will be present in the
+// //same city
+// func SpawnAliens(alienCount int) []*Alien {
+
+// 	if alienCount < 2 {
+// 		msg := "Error: Alient count cannot be less then 2"
+// 		log.Error(msg)
+// 		panic(msg)
+// 	}
+
+// 	//Get fancy alien names from this NameGenerator library
+// 	seed := time.Now().UTC().UnixNano()
+// 	nameGenerator := namegenerator.NewNameGenerator(seed)
+
+// 	//Keep a track of Spawned Aliens
+// 	//This struct will be used by start simulation function to
+// 	//Launch the aliens
+// 	var result []*Alien = make([]*Alien, alienCount)
+// 	for i := 0; i < alienCount; i++ {
+// 		result[i] = &Alien{Name: util.Capitalise(nameGenerator.Generate())}
+// 	}
+// 	return result
+// }
