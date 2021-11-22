@@ -12,6 +12,7 @@ import (
 
 const QUEEN_TAG = "QUEEN"
 
+//Language format used by aliens
 type AlienLanguage struct {
 	AlienName   string
 	AlienStatus Status
@@ -23,13 +24,14 @@ func (al AlienLanguage) String() string {
 
 type Queen struct {
 	Children  map[string]*Alien
-	QueenChan chan AlienLanguage
+	QueenChan chan AlienLanguage //Telepathic link between the Queen and her offspring
 }
 
 func (q *Queen) String() string {
 	return fmt.Sprintf("%v[%v]", QUEEN_TAG, q.Children)
 }
 
+//Print the status of the Queen Mother and her kin
 func (q *Queen) PrintStatus() {
 	var data []string
 	for _, child := range q.Children {
@@ -38,6 +40,8 @@ func (q *Queen) PrintStatus() {
 	fmt.Printf("Queen [%v]", strings.Join(data, ", "))
 }
 
+//Wait for all Hacthed Children to return atleast ONE status
+//and then close the Queen Channel with her offspring
 func (q *Queen) WaitChildren() {
 	var total, pending int = len(q.Children), 0
 	for d := range q.QueenChan {
@@ -49,12 +53,14 @@ func (q *Queen) WaitChildren() {
 	}
 }
 
+//Iterate over each child alien and Hatch them
 func (q *Queen) HatchChildren(maxMoves int, world *World) {
 	for alienName := range q.Children {
 		q.Children[alienName].Hatch(maxMoves, world, q.QueenChan)
 	}
 }
 
+//Randomly place Eggs in Cities with NO alien occupant
 func (q *Queen) LayEggs(childCount int, world *World) {
 
 	if childCount < 2 {
@@ -63,6 +69,8 @@ func (q *Queen) LayEggs(childCount int, world *World) {
 		panic(msg)
 	}
 
+	//At the start each alien should be alone in a city
+	//So Aliens cannot be more then the actual city
 	if childCount > world.GetCityCount() {
 		msg := fmt.Sprintf("aliens (%v) cannot be more then the cities(%v)", childCount, world.GetCityCount())
 		_ = fmt.Errorf(msg)

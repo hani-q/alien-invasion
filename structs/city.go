@@ -5,7 +5,11 @@ import (
 	"regexp"
 	"strings"
 	"sync"
+
+	log "github.com/sirupsen/logrus"
 )
+
+const CITY_TAG = "CITY"
 
 type Direction string
 
@@ -102,10 +106,12 @@ func (c *City) RandomNeighbour() (*City, string) {
 
 	if len(availableNeighbours) > 0 {
 		for k, neighbour := range availableNeighbours {
+			log.Debugf("%v: returned Random neighbour %v:%v", CITY_TAG, k, neighbour.Name)
 			return neighbour, k
 		}
 	}
 
+	log.Debugf("%v: No Random neighbour returned", CITY_TAG)
 	return nil, ""
 
 }
@@ -160,29 +166,3 @@ func (r *Road) getRoadName() string {
 
 	return fmt.Sprintf(" %v=%v", r.DirName, r.DestCity.getCityName())
 }
-
-// //Instanitiate the aliens with count provided in cli Args
-// //Each alien will be placed in a loving and caring city
-// //It will be made sure that no other alien will be present in the
-// //same city
-// func SpawnAliens(alienCount int) []*Alien {
-
-// 	if alienCount < 2 {
-// 		msg := "Error: Alient count cannot be less then 2"
-// 		log.Error(msg)
-// 		panic(msg)
-// 	}
-
-// 	//Get fancy alien names from this NameGenerator library
-// 	seed := time.Now().UTC().UnixNano()
-// 	nameGenerator := namegenerator.NewNameGenerator(seed)
-
-// 	//Keep a track of Spawned Aliens
-// 	//This struct will be used by start simulation function to
-// 	//Launch the aliens
-// 	var result []*Alien = make([]*Alien, alienCount)
-// 	for i := 0; i < alienCount; i++ {
-// 		result[i] = &Alien{Name: util.Capitalise(nameGenerator.Generate())}
-// 	}
-// 	return result
-// }

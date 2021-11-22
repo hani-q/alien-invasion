@@ -8,7 +8,10 @@ import (
 	"sync"
 
 	"github.com/hani-q/alien-invasion/util"
+	log "github.com/sirupsen/logrus"
 )
+
+const WORLD_TAG = "WORLD"
 
 //Map of the World.. in every sense of the word
 type World struct {
@@ -16,13 +19,13 @@ type World struct {
 	mu   sync.Mutex // guards
 }
 
-// var XWorld = World{Data: make(map[string]*City)}
-
 //Prints the Map world in the same format as Input file
 func (w *World) String() string {
 	var printData string
 	if w.Data == nil || len(w.Data) == 0 {
-		return "World is Empty!...Generate World Map first"
+		msg := "World is Empty!...Generate World Map first"
+		log.Warnf("%v: %v", QUEEN_TAG, msg)
+		return msg
 	} else {
 		for _, cityData := range w.Data {
 			printData = printData + cityData.String()
@@ -32,12 +35,15 @@ func (w *World) String() string {
 	}
 }
 
+//Count the cities. Lock first to avoid deletion during
+//print phase
 func (w *World) GetCityCount() int {
 	w.mu.Lock()
 	defer w.mu.Unlock()
 	return len(w.Data)
 }
 
+//Get City Ptr by name
 func (w *World) GetCity(name string) *City {
 	w.mu.Lock()
 	defer w.mu.Unlock()
@@ -47,7 +53,7 @@ func (w *World) GetCity(name string) *City {
 //Open the Map file path provided and populatre the World struct
 func LoadWorldMap(filePath string) *World {
 	file, err := os.Open(filePath)
-	if isError(err) {
+	if util.IsError(err) {
 		msg := fmt.Sprintf("cannot open %v", filePath)
 		_ = fmt.Errorf(msg)
 		panic(msg)
@@ -151,7 +157,6 @@ func (w *World) DeleteCity(cityName string) {
 
 		//Check all of the Cities Roads and go to those Cities
 		//and Delete the reverse road links
-
 		if entry.North != nil {
 			entry.North.DestCity.South = nil
 			entry.North.DestCity = nil
@@ -173,13 +178,8 @@ func (w *World) DeleteCity(cityName string) {
 		}
 	}
 
+	log.Infof("%v: Deleting city %v", QUEEN_TAG, cityName)
+
 	//Delete the City itSelf
 	delete(w.Data, cityName)
-}
-
-func isError(err error) bool {
-	if err != nil {
-		fmt.Println(err.Error())
-	}
-	return (err != nil)
 }

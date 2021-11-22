@@ -4,6 +4,7 @@ import (
 	"testing"
 )
 
+//Test if an Alien gets exhausted
 func TestExhaustedAlien(t *testing.T) {
 	testMapFilePath := "../test/world_test_trapped.txt"
 
@@ -29,6 +30,7 @@ func TestExhaustedAlien(t *testing.T) {
 	}
 }
 
+//Test if an Alien gets trapped
 func TestTrappedAlien(t *testing.T) {
 	testMapFilePath := "../test/world_test_trapped.txt"
 
@@ -53,6 +55,7 @@ func TestTrappedAlien(t *testing.T) {
 	}
 }
 
+//Test if an Alien Dies
 func TestDeadAlien(t *testing.T) {
 	testMapFilePath := "../test/world_test_trapped.txt"
 
@@ -89,6 +92,7 @@ func TestDeadAlien(t *testing.T) {
 	}
 }
 
+//Test if an alien dies when recving on channel
 func TestSendDieToAlien(t *testing.T) {
 	testMapFilePath := "../test/world_test_trapped.txt"
 

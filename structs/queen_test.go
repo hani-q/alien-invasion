@@ -5,7 +5,7 @@ import (
 	"testing"
 )
 
-// Test when aliens are with less count
+//Test we should panic if Aliens are 0 from cli args
 func TestLayEggsAliensZeroPanic(t *testing.T) {
 	defer func() {
 		if r := recover(); r == nil {
@@ -25,6 +25,7 @@ func TestLayEggsAliensZeroPanic(t *testing.T) {
 	queen.LayEggs(alienCount, xWorld)
 }
 
+//Test we should panic if we are only given one Alien
 func TestLayEggsAliensOnePanic(t *testing.T) {
 	defer func() {
 		if r := recover(); r == nil {
@@ -44,6 +45,7 @@ func TestLayEggsAliensOnePanic(t *testing.T) {
 	queen.LayEggs(alienCount, xWorld)
 }
 
+//Test we should panic if aliens are greater then the cities
 func TestLayEggsAliensMoreThenCitiesPanic(t *testing.T) {
 	defer func() {
 		if r := recover(); r == nil {
@@ -62,6 +64,7 @@ func TestLayEggsAliensMoreThenCitiesPanic(t *testing.T) {
 	queen.LayEggs(alienCount, xWorld)
 }
 
+//Test how many aliens are hatched when the Queen lays here eggs
 func TestHatchedChildCount(t *testing.T) {
 	testMapFilePath := "../test/world_test_ten.txt"
 
@@ -91,6 +94,7 @@ func TestHatchedChildCount(t *testing.T) {
 	}
 }
 
+//Test if hatched aliens are exhasuing proper or not
 func TestExhaustedChildCount(t *testing.T) {
 	testMapFilePath := "../test/world_test_non_connected.txt"
 
@@ -121,6 +125,7 @@ func TestExhaustedChildCount(t *testing.T) {
 	}
 }
 
+//Test if hatched aliens are getting trapped proper or not
 func TestTrappedChildCount(t *testing.T) {
 	testMapFilePath := "../test/world_test_trapped.txt"
 
@@ -157,6 +162,7 @@ func TestTrappedChildCount(t *testing.T) {
 	}
 }
 
+//Test if hatched aliens are dying proper or not
 func TestDeadChildCount(t *testing.T) {
 	testMapFilePath := "../test/world_test_trapped.txt"
 

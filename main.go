@@ -41,6 +41,7 @@ func main() {
 		panic(msg)
 	}
 
+	//0 iterations ? whats the point
 	if numIterations == 0 {
 		msg := fmt.Sprintf("numIterations (%v) cannot be 0", numIterations)
 		_ = fmt.Errorf(msg)
@@ -58,7 +59,7 @@ func main() {
 	fmt.Println(xWorld)
 
 	//Bring in the Queen via the inter-dimensional portal
-	//She will arrive in the Eaths outer-orbit
+	//She will arrive in the xWorlds outer-orbit
 	queen := structs.Queen{Children: make(map[string]*structs.Alien),
 		QueenChan: make(chan structs.AlienLanguage)}
 
@@ -72,6 +73,7 @@ func main() {
 	fmt.Printf("\nWhats left after the Mayhem\n\n")
 	fmt.Println(xWorld)
 
-	fmt.Printf("\nWhats left of the Invading Queen and ker offspring\n\n")
+	//Log the state of the battle weary queen and her offspring
+	fmt.Printf("\nWhats left of the Invading Queen and her kin\n\n")
 	queen.PrintStatus()
 }

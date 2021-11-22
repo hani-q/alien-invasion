@@ -114,7 +114,7 @@ func TestLayEggsCount(t *testing.T) {
 	}
 }
 
-// //Test when aliens are placed in a world each one is not duplicated
+//Test when aliens are placed in a world each one is not duplicated
 func TestLayEggsDuplication(t *testing.T) {
 
 	//We know the test file has 10 cities
