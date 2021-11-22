@@ -12,10 +12,9 @@ func TestLoadWorldMap(t *testing.T) {
 	//We know the test file has 10 cities
 	wanted := 10
 	testMapFilePath := "../test/world_test_ten.txt"
-	LoadWorldMap(testMapFilePath)
+	xWorld := LoadWorldMap(testMapFilePath)
 
-	//XWorld the global world var should be updated
-	cityCount := XWorld.GetCityCount()
+	cityCount := xWorld.GetCityCount()
 
 	if cityCount != wanted {
 		t.Fatalf(`LoadWorldMap(%v) = %v, %v, want %v, error`, testMapFilePath, cityCount,
@@ -38,8 +37,8 @@ func TestWorldCityLinks(t *testing.T) {
 	direction1 := xWorld.Data["1"].West.DirName
 	direction10 := xWorld.Data["10"].East.DirName
 
-	name1 := XWorld.Data["1"].West.DestCity.Name
-	name10 := XWorld.Data["10"].East.DestCity.Name
+	name1 := xWorld.Data["1"].West.DestCity.Name
+	name10 := xWorld.Data["10"].East.DestCity.Name
 
 	if direction1 != West {
 		t.Fatalf(`LoadWorldMap(%v) %v , %v, want %v, error`, testMapFilePath, direction1, West,
@@ -89,7 +88,7 @@ func TestDeleteCityAndLinks(t *testing.T) {
 }
 
 //Test when aliens are placed in a world each one is assigned to a single city
-func TestPlaceAliensCount(t *testing.T) {
+func TestLayEggsCount(t *testing.T) {
 
 	//We know the test file has 10 cities
 	testMapFilePath := "../test/world_test_ten.txt"
@@ -104,11 +103,9 @@ func TestPlaceAliensCount(t *testing.T) {
 	placedAliens := 0
 
 	for _, cityData := range xWorld.Data {
-
 		if cityData.Occupant != nil {
 			placedAliens++
 		}
-
 	}
 
 	if alienCount != placedAliens {
@@ -118,7 +115,7 @@ func TestPlaceAliensCount(t *testing.T) {
 }
 
 // //Test when aliens are placed in a world each one is not duplicated
-func TestPlaceAliensDuplication(t *testing.T) {
+func TestLayEggsDuplication(t *testing.T) {
 
 	//We know the test file has 10 cities
 	testMapFilePath := "../test/world_test_ten.txt"
@@ -154,6 +151,5 @@ func checkAlienInArray(s []string, name string) bool {
 			return true
 		}
 	}
-
 	return false
 }

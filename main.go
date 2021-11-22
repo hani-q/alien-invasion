@@ -41,6 +41,12 @@ func main() {
 		panic(msg)
 	}
 
+	if numIterations == 0 {
+		msg := fmt.Sprintf("numIterations (%v) cannot be 0", numIterations)
+		_ = fmt.Errorf(msg)
+		panic(msg)
+	}
+
 	//Load the map.txt file into the Map pf world
 	log.Info("Loading world from Map file", *inputMapPathStr)
 	xWorld := structs.LoadWorldMap(*inputMapPathStr)
@@ -48,29 +54,24 @@ func main() {
 	//Print Statistics about the cities
 	log.Infof("%v cities have been loaded from map file", xWorld.GetCityCount())
 
-	if alienCount > xWorld.GetCityCount() {
-		msg := fmt.Sprintf("aliens (%v) cannot be more then the cities(%v)", alienCount, xWorld.GetCityCount())
-		_ = fmt.Errorf(msg)
-		panic(msg)
-	}
-
 	fmt.Printf("\nWorld in peacefull times\n\n")
 	fmt.Println(xWorld)
 
 	//Bring in the Queen via the inter-dimensional portal
 	//She will arrive in the Eaths outer-orbit
-	queen := structs.Queen{Children: make(map[string]*structs.Alien), QueenChan: make(chan structs.AlienLanguage)}
+	queen := structs.Queen{Children: make(map[string]*structs.Alien),
+		QueenChan: make(chan structs.AlienLanguage)}
 
 	//Spew the Queen Mothers Eggs the Entire X-World
 	queen.LayEggs(alienCount, xWorld)
 
-	queen.HatchChildren(numIterations)
+	queen.HatchChildren(numIterations, xWorld)
 	queen.WaitChildren()
 
 	//Log the state of the World after the mayhem
 	fmt.Printf("\nWhats left after the Mayhem\n\n")
 	fmt.Println(xWorld)
 
-	fmt.Printf("\nWhats left of the Invading Queen and his children\n\n")
+	fmt.Printf("\nWhats left of the Invading Queen and ker offspring\n\n")
 	queen.PrintStatus()
 }

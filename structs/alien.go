@@ -30,10 +30,14 @@ type Alien struct {
 
 }
 
-func (a *Alien) Hatch(maxMoves int, queenChan chan<- AlienLanguage) {
-	//Counter to track an Alien that is stuck between 2 cities
-	//After counter is 0. Alien wont move anymore
+func (a *Alien) Hatch(maxMoves int, world *World, queenChan chan<- AlienLanguage) {
+	if maxMoves == 0 {
+		msg := fmt.Sprintf("numIterations (%v) cannot be 0", maxMoves)
+		_ = fmt.Errorf(msg)
+		panic(msg)
+	}
 
+	//Counter to track an Alien that is stuck between 2 cities
 	a.status = HATCHED
 	log.Infof("%v: [%v] in '%v' has Hatched", ALIEN_TAG, a.Name, a.CurrCityName)
 
@@ -62,7 +66,7 @@ func (a *Alien) Hatch(maxMoves int, queenChan chan<- AlienLanguage) {
 				//Move to next posible City
 				//Get a random direction
 
-				currCityPtr := XWorld.GetCity(a.CurrCityName)
+				currCityPtr := world.GetCity(a.CurrCityName)
 				if currCityPtr == nil {
 					//City has been Destoryed
 					return
@@ -142,7 +146,7 @@ func (a *Alien) Hatch(maxMoves int, queenChan chan<- AlienLanguage) {
 						log.Infof("%v [%v] & [%v] are **DEAD** and took '%v' with them", ALIEN_TAG, a.Name, nextAlien.Name, nextCityPtr.Name)
 
 						//Initial Delete of City from XWorld
-						XWorld.DeleteCity(nextCityPtr.Name)
+						world.DeleteCity(nextCityPtr.Name)
 						queenChan <- AlienLanguage{AlienName: a.Name, AlienStatus: a.status}
 						nextCityPtr.mu.Unlock()
 						currCityPtr.mu.Unlock()

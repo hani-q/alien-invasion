@@ -49,9 +49,9 @@ func (q *Queen) WaitChildren() {
 	}
 }
 
-func (q *Queen) HatchChildren(maxMoves int) {
+func (q *Queen) HatchChildren(maxMoves int, world *World) {
 	for alienName := range q.Children {
-		q.Children[alienName].Hatch(maxMoves, q.QueenChan)
+		q.Children[alienName].Hatch(maxMoves, world, q.QueenChan)
 	}
 }
 
@@ -60,6 +60,12 @@ func (q *Queen) LayEggs(childCount int, world *World) {
 	if childCount < 2 {
 		msg := "Error: Alient count cannot be less then 2"
 		log.Error(msg)
+		panic(msg)
+	}
+
+	if childCount > world.GetCityCount() {
+		msg := fmt.Sprintf("aliens (%v) cannot be more then the cities(%v)", childCount, world.GetCityCount())
+		_ = fmt.Errorf(msg)
 		panic(msg)
 	}
 

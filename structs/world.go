@@ -10,28 +10,13 @@ import (
 	"github.com/hani-q/alien-invasion/util"
 )
 
-// //This is used only to keep trakc of All spawn Aliens
-// //so that we can loop over these and instruct them to Wander
-// type AlienYellowPages map[string]*Alien
-
-// var Ayp AlienYellowPages = make(AlienYellowPages)
-
-// func (Ayp AlienYellowPages) String() string {
-// 	keys := reflect.ValueOf(Ayp).MapKeys()
-// 	strkeys := make([]string, len(keys))
-// 	for i := 0; i < len(keys); i++ {
-// 		strkeys[i] = keys[i].String()
-// 	}
-// 	return strings.Join(strkeys, ",")
-// }
-
 //Map of the World.. in every sense of the word
 type World struct {
 	Data map[string]*City
 	mu   sync.Mutex // guards
 }
 
-var XWorld = World{Data: make(map[string]*City)}
+// var XWorld = World{Data: make(map[string]*City)}
 
 //Prints the Map world in the same format as Input file
 func (w *World) String() string {
@@ -77,6 +62,8 @@ func LoadWorldMap(filePath string) *World {
 		fileLines = append(fileLines, scanner.Text())
 	}
 
+	var xWorld = World{Data: make(map[string]*City)}
+
 	for _, line := range fileLines {
 		cityData := strings.Split(line, " ")
 
@@ -93,12 +80,12 @@ func LoadWorldMap(filePath string) *World {
 				// Making sure City name in file is always begins with a Cap
 				roadData[1] = util.Capitalise(roadData[1])
 
-				addCityToWorld(cityName, &XWorld, roadData)
+				addCityToWorld(cityName, &xWorld, roadData)
 			}
 		}
 	}
 
-	return &XWorld
+	return &xWorld
 }
 
 //The parsed cities that are read from map are added to the Map struct
