@@ -50,9 +50,13 @@ the assumptions you are making."*
 3. X-world is ruled by an obnoxius Dictator. He for some reason destoryed and recreated all the cities on X World and renamed this world the "X-Grid"
 4. The populace in X-world (X-wolrdlings still dont prefer to call it X-Grid) all use flying as means of transportation. Only Cyclists are allowed to use roads.
 5. All cities have can have up to 4 roads (in cardinal directions) leading in and out of each city.
-6. Alien species is called "Zentradi". They came to X-world by means of flying. After interacting with Earths atmosphere they can only crawl on Asphalt
-7. Zentardi have become Feral after interacting with the X-world's atmosphere and wanty to kill each other off. When one Zentradi dies he unleases a nucealear blast that can wipe out an entire city and any other Zentradi
-8. X-worldlings dont offer any resitance to the Zentradi invasion
+6. Alien species is called "Zentradi". 
+7. The Zetardi Queen "XX121". Arrived in the Earth Outer orbit and layed her eggs. Which then landed on different cities across X-World
+8. The Queen Mother controls the aliens via Telepathic Link
+9. Her purpose is to send her children to each city of the world and abosrb the culture
+10. After interacting with X-Worlds atmosphere the children can only crawl on Asphalt
+11. Zentardi Children have become Feral after interacting with the X-world's atmosphere and wanty to kill each other off. When one Zentradi dies he unleases a nucealear blast that can wipe out an entire city and any other Zentradi
+12. X-worldlings dont offer any resitance to the Zentradi invasion
    
 
 ****Assumptions****
@@ -62,14 +66,21 @@ the assumptions you are making."*
 3. Each city can only have one neghbouring city in one direction. Hence the GRID
 4. If "Foo" is to the North of "Baz". Then "Baz" is to the South of "Foo". So adding a link one way.. it will be added both ways between both cities.
 5. If "Foo" is destroyed its North-ward road to "Baz" is destroyed. "Baz"'s Southward road to "Foo" is also removed.
-6. Aliens when the arrive on X-World. Avoided going to any city that already had an alien. Meaning on the start of program each city will have 1 alien and at min have 0.
+6. Inn the start of program each city will have 1 alien and at min have 0.
 7. Each city can only handle 2 aliens. these guys are Humongous. 
-8. An Alien is TRAPPED if all roads are destroyed OR all available neighbors are full
-9.  Alien can go back to the city it just came from.
-10. Aliens cannot be greater then the Count of Cities. So in best case sceanrio num Aliens === num Cities.
-11. Atleast 2 Aliens should descend upon X-World
-12. World file will atleast one direction against a mentioned city. This can lead to a problem if One alien has a Road to a city that only has a Road back. It is the Aliens fault for being stupid and getting off-road
-13. Each Alien has a different pace with which it Crawls.. Some are young .. some are old
+8. An Alien is HATCHED at the start of the program
+9. An Alien is TRAPPED if all roads are destroyed OR all available neighbors are full
+10. An Alien is TRAPPED if all roads are destroyed OR all available neighbors are full
+11. An Alien is EXHUASTED if number of iterations are over
+12. An Alien is DEAD if it encounters another Alien in any other city
+13. Alien can go back to the city it just came from.
+14. Aliens cannot be greater then the Count of Cities. So in best case sceanrio num Aliens === num Cities.
+15. Alien children cannot be less then 2
+16. World file will atleast one direction against a mentioned city. This can lead to a problem if One alien has a Road to a city that only has a Road back. It is the Aliens fault for being stupid and getting off-road
+17. Each Alien moves with its Hearbeat. One Heartbeat/tick = one Move
+18. Each Alien has a different pace with which it Crawls.. Some are young .. some are old Hence the Tick is random
+19. Each alien returns a status to Queen mother on her personal channel. 
+20. Queen will wait for each Child to return atleast one Status (EXHAUSTED, TRAPPED, DEAD)
 
 ***How to Run***
 ```

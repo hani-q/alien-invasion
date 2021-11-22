@@ -3,9 +3,9 @@ package main
 import (
 	"flag"
 	"fmt"
+	"math/rand"
 	"os"
-	"strings"
-	"sync"
+	"time"
 
 	"github.com/hani-q/alien-invasion/structs"
 	log "github.com/sirupsen/logrus"
@@ -22,6 +22,8 @@ func main() {
 	inputMapPathStr := flag.String("world_file", "./test/world_tiny.txt", "Text file containing the world. Defaults to ./test/world_tiny.txt")
 	flag.Parse()
 
+	rand.Seed(time.Now().UnixNano())
+
 	//InitalizeLogging
 	if !printStdout {
 		var file, err = os.OpenFile("build/logs.txt", os.O_WRONLY|os.O_CREATE, 0666)
@@ -34,7 +36,14 @@ func main() {
 
 	//One alien will roam the world endlessly, since no City will be destroyed
 	if alienCount < 2 {
-		msg := fmt.Sprintf("too few aliens (%v) for simulation, what will a lonely alien do", alienCount)
+		msg := fmt.Sprintf("too few aliens (%v) for simulation", alienCount)
+		_ = fmt.Errorf(msg)
+		panic(msg)
+	}
+
+	//0 iterations ? whats the point
+	if numIterations == 0 {
+		msg := fmt.Sprintf("numIterations (%v) cannot be 0", numIterations)
 		_ = fmt.Errorf(msg)
 		panic(msg)
 	}
@@ -43,49 +52,28 @@ func main() {
 	log.Info("Loading world from Map file", *inputMapPathStr)
 	xWorld := structs.LoadWorldMap(*inputMapPathStr)
 
-	//Spawn the Aliens and assign each to a unique and random city
-	xWorld.PlaceTheAliens(alienCount)
+	//Print Statistics about the cities
+	log.Infof("%v cities have been loaded from map file", xWorld.GetCityCount())
 
-	//Log the state of the Wold after the mayhem
-	log.Info(xWorld)
 	fmt.Printf("\nWorld in peacefull times\n\n")
 	fmt.Println(xWorld)
 
-	//Start the simulation
-	startSimulation(numIterations)
+	//Bring in the Queen via the inter-dimensional portal
+	//She will arrive in the xWorlds outer-orbit
+	queen := structs.Queen{Children: make(map[string]*structs.Alien),
+		QueenChan: make(chan structs.AlienLanguage)}
 
-	//Log the state of the Wold after the mayhem
+	//Spew the Queen Mothers Eggs the Entire X-World
+	queen.LayEggs(alienCount, xWorld)
+
+	queen.HatchChildren(numIterations, xWorld)
+	queen.WaitChildren()
+
+	//Log the state of the World after the mayhem
 	fmt.Printf("\nWhats left after the Mayhem\n\n")
 	fmt.Println(xWorld)
-	log.Info(xWorld)
 
-	//Save it as final_map.txt
-
-	//Printing Alien stats after the simulation ends
-	var trappedAliens []string
-	for alienName, alienData := range structs.Ayp {
-		if alienData.Trapped {
-			trappedAliens = append(trappedAliens, alienName)
-		}
-	}
-
-	log.Infof("%v Aliens are still trapped and need rescue\nNames=%v", len(trappedAliens), strings.Join(trappedAliens, ", "))
-}
-
-//Starts the simulation by creating a WaitGroup for all the
-//stored in Alien Yello Pages map
-func startSimulation(maxMoves int) {
-	var wg sync.WaitGroup
-
-	for _, alienData := range structs.Ayp {
-		log.Infof("Launching Alien=%v", alienData.Name)
-		wg.Add(1)
-
-		//Calling wander will make the Alien explore its
-		//neighbouring cities
-		go alienData.Wander(&wg, maxMoves)
-	}
-
-	//Wait for all Aliens to finish (Dear or Alive or Trapped)
-	wg.Wait()
+	//Log the state of the battle weary queen and her offspring
+	fmt.Printf("\nWhats left of the Invading Queen and her kin\n\n")
+	queen.PrintStatus()
 }
