@@ -42,6 +42,8 @@ func (a *Alien) Hatch(maxMoves int, world *World, queenChan chan<- AlienLanguage
 	log.Infof("%v: [%v] in '%v' has Hatched", ALIEN_TAG, a.Name, a.CurrCityName)
 
 	go func() {
+		//Tick means alien should move
+		//Random so that each alien moves differently form the other
 		ticker := time.NewTicker(time.Duration(rand.Intn(500)) * time.Millisecond)
 		for {
 			select {
